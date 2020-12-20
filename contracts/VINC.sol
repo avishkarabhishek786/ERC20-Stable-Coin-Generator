@@ -2,10 +2,11 @@
 pragma solidity >=0.6.0 <0.8.0;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract VINC is ERC20 {
+contract VINC is ERC20, Ownable {
 
-    address private owner;
+    address private vinc_owner;
     
     bool stopped = false;
     
@@ -16,7 +17,15 @@ contract VINC is ERC20 {
 
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public ERC20(_name, _symbol) {
         _mint(msg.sender, _initialSupply);
-        owner = msg.sender;
+        vinc_owner = msg.sender;
+    }
+    
+    function stop() public onlyOwner {
+        stopped = true;
+    }
+
+    function start() public onlyOwner {
+        stopped = false;
     }
     
     function transferToken(address recipient, uint256 amount) public isRunning returns (bool) {
