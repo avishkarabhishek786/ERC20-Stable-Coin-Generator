@@ -1,0 +1,27 @@
+{
+  "name": "vinc",
+  "version": "0.0.1",
+  "description": "Solidity smart contract for VINC tokens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avishkarabhishek786/VINC.git"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "VINC"
+  ],
+  "author": "Abhishek Sinha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/avishkarabhishek786/VINC/issues"
+  },
+  "homepage": "https://github.com/avishkarabhishek786/VINC#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.3.0"
+  }
+}

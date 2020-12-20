@@ -3,40 +3,33 @@ pragma solidity >=0.6.0 <0.8.0;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol';
 
-contract VINC is ERC20, Ownable {
+contract VINC is ERC20Pausable, Ownable {
 
     address private vinc_owner;
     
-    bool stopped = false;
-    
-    modifier isRunning {
-        assert (!stopped);
-        _;
-    }
-
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public ERC20(_name, _symbol) {
         _mint(msg.sender, _initialSupply);
         vinc_owner = msg.sender;
     }
     
-    function stop() public onlyOwner {
-        stopped = true;
-    }
-
-    function start() public onlyOwner {
-        stopped = false;
-    }
-    
-    function transferToken(address recipient, uint256 amount) public isRunning returns (bool) {
-        transfer(recipient, amount);
+    function transfer(address recipient, uint256 amount) public virtual override whenNotPaused returns (bool) {
+        super.transfer(recipient, amount);
         return true;
     }
     
-    function transferTokenFrom(address sender, address recipient, uint256 amount) public returns (bool) {
-        transferFrom(sender, recipient, amount);
+    function transferFrom(address sender, address recipient, uint256 amount) public virtual override whenNotPaused returns (bool) {
+        super.transferFrom(sender, recipient, amount);
         return true;
     }
     
-
+    function stop() public {
+        super._pause();
+    }
+    
+    function start() public {
+        super._unpause();
+    }
+    
 }
