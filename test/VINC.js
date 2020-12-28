@@ -1,3 +1,4 @@
+/*
 const VINC = artifacts.require('VINC');
 
 contract('VINC', ([account1, account2, account3])=> {
@@ -8,8 +9,8 @@ contract('VINC', ([account1, account2, account3])=> {
     let totalSupply = 0; 
 
     before(async () =>{
-        contract_name = "Ally token";
-        symbol = "ALLY"; 
+        contract_name = "Token 1";
+        symbol = "TKN1"; 
         totalSupply = 1000; 
         vinc = await VINC.deployed(contract_name, symbol, totalSupply);
     }); 
@@ -53,3 +54,4 @@ contract('VINC', ([account1, account2, account3])=> {
     });
 
 });
+*/

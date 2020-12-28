@@ -34,8 +34,8 @@ contract VINC is ERC20Pausable, Ownable {
         super._unpause();
     }
     
-    // Set a minimum amount you must receive from exchange address in a trade
-    function set_expected_receiving_tokens(address buyer, uint256 amount) internal {
+    // Set a minimum amount you must receive from buyer address in a trade
+    function set_expected_receiving_tokens(address buyer, uint256 amount) external onlyOwner {
         require(vinc_owner != address(0), "ERC20: trading from the zero address");
         require(buyer != address(0), "ERC20: trading to the zero address");
 
