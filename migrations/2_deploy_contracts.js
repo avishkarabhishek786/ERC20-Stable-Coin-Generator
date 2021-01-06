@@ -11,14 +11,20 @@ module.exports = async function (deployer, _network, accounts) {
   await deployer.deploy(TokenExchange, token1.address, token2.address, {from: accounts[2]});
   const tokenExchange = await TokenExchange.deployed();
 
-//   const tokenExchangeAddr = tokenExchange.address;
+  const token1Addr = token1.address;
+  const token2Addr = token2.address;
+  const tokenExchangeAddr = tokenExchange.address;
 
-  const owner1 = await token1.owner();
-  const owner2 = await token2.owner();
+  console.log("token1 address", token1Addr);  
+  console.log("token2 address", token2Addr);  
+  console.log("tokenExchange address", tokenExchangeAddr);  
 
-  console.log(owner1);
-  console.log(owner2);
-  console.log(accounts[0], accounts[1], accounts[2]);
+//   const owner1 = await token1.owner();
+//   const owner2 = await token2.owner();
+
+//   console.log(owner1);
+//   console.log(owner2);
+//   console.log(accounts[0], accounts[1], accounts[2]);
 
 //   console.log(tokenExchangeAddr);
 //   console.log(owner1==accounts[0]);
