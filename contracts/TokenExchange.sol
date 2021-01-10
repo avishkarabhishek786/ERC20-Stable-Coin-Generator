@@ -8,7 +8,7 @@ contract TokenExchange {
     VINC public token1;
     VINC public token2;
     
-    string public name = 'ERC20 Tokens Instant Exchange';
+    string public name = 'ERC2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      0 Tokens Instant Exchange';
     
     event TokensPurchased(
         VINC coin,
