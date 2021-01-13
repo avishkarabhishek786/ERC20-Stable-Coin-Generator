@@ -11,9 +11,16 @@ contract VINC is ERC20Pausable, Ownable {
     
     mapping (address => mapping (address => uint256)) private _expected_receiving_tokens;
     
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public ERC20(_name, _symbol) {
-        _mint(msg.sender, _initialSupply);
-        vinc_owner = msg.sender;
+    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public payable ERC20(_name, _symbol) {
+        // _mint(msg.sender, _initialSupply);
+        // vinc_owner = msg.sender;
+        require(tx.origin != address(0), "Token creator is not a valid address.");
+        // Since this token is actually created by TokenFactory msg.sender is TokenFactory 
+        // But we want the owner to be person who called TokenFactory i.e tx.origin 
+        // So ownership and initial tokens are transferred to tx.origin
+        transferOwnership(tx.origin);
+        _mint(tx.origin, _initialSupply);
+        vinc_owner = tx.origin;
     }
     
     function transfer(address recipient, uint256 amount) public virtual override whenNotPaused returns (bool) {

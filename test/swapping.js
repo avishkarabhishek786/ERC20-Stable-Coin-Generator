@@ -1,3 +1,4 @@
+/*
 const VINC = artifacts.require('VINC');
 const TokenExchange = artifacts.require("TokenExchange");
 
@@ -60,3 +61,4 @@ contract('SwapTest', ([account1, account2, account3])=> {
 
 
 });
+*/

@@ -8,8 +8,8 @@ contract TokenExchange {
     VINC public token1;
     VINC public token2;
     
-    string public name = 'ERC2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      0 Tokens Instant Exchange';
-    
+    string public name = 'ERC20 Tokens Instant Exchange';
+ 
     event TokensPurchased(
         VINC coin,
         address sender,
@@ -20,6 +20,11 @@ contract TokenExchange {
     constructor(VINC _token1, VINC _token2) public {
         token1 = _token1;
         token2 = _token2;
+    }
+
+    function setTokensToSwap(VINC _token1, VINC _token2) public {
+        token1 = _token1; // your/caller's token
+        token2 = _token2; // other party's token
     }
     
     function _safeTransferFrom(
@@ -33,7 +38,7 @@ contract TokenExchange {
         emit TokensPurchased(token, sender, recipient, amount);
      }
      
-     function swap(address owner1, uint amount1, address owner2, uint amount2) public {
+     function swap(address owner1, uint amount1, address owner2, uint amount2) external {
         require(msg.sender == owner1 || msg.sender == owner2, "Not authorized");
         require(owner1 != address(0) || owner2 != address(0), "Swapping to the zero address");
         require(amount1 > 0 || amount2 > 0, "Swapping to zero amount");
