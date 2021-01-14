@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import VINC from "./abis/VINC.json";
+import TokenFactory from "./abis/TokenFactory.json";
 import TokenExchange from "./abis/TokenExchange.json";
 import { getWeb3 } from "./utils";
 
@@ -11,6 +12,7 @@ const App = () => {
     const [token2, setToken2] = useState(undefined);
     const [owner1, setOwner1] = useState(undefined);
     const [owner2, setOwner2] = useState(undefined);
+    const [tokenFactory, setTokenFactory] = useState(undefined);
     const [tokenExchange, setTokenExchange] = useState(undefined);
     const [tokenExchangeAddr, settokenExchangeAddr] = useState(undefined);
     const [swapAllowance, setSwapAllowance] = useState(0);
@@ -29,40 +31,47 @@ const App = () => {
             const web3 = await getWeb3();
             //console.log(web3);
             const loggedInAccount = await web3.eth.getAccounts();
+            web3.eth.defaultAccount = loggedInAccount[0];
             const networkId = await web3.eth.net.getId();
 
+            const tokenFactoryData = TokenFactory.networks[networkId];
             const token1Data = VINC.networks[networkId];
             const token2Data = VINC.networks[networkId];
             const tokenExchangeData = TokenExchange.networks[networkId];
 
-            if (!token1Data || !token2Data || !tokenExchangeData) {
+            if (!tokenFactoryData  || !tokenExchangeData) {
                 alert("Contracts not deployed on this network");
                 throw new Error('Error');
             }
 
-            // @important: Always change the address after migrations  
-            const token1 = new web3.eth.Contract(VINC.abi, "0xC7Be22AB5CBe66E73274Fe2941DBacbBe22DF9fF");
-            const token2 = new web3.eth.Contract(VINC.abi, "0x02bF7d7237CAf2e038405B94D61e6Bae53104B10");
-            // const token1 = new web3.eth.Contract(VINC.abi, token1Data.address);
-            // const token2 = new web3.eth.Contract(VINC.abi, token2Data.address);
-            const tokenExchange = new web3.eth.Contract(TokenExchange.abi, tokenExchangeData.address);
+            const token1DeployerAddr = "0x44cccE6Da2023952fEB0aa8Eb620568D693aAAE1";
+            const token2DeployerAddr = "0x3CC32e1D2e965C588F1bf41bB9b187F91BF94a44";
 
+            // @important: Always change the address after migrations  
+            const tokenFactory = new web3.eth.Contract(TokenFactory.abi, tokenFactoryData.address);
+            const token1Addr = await tokenFactory.methods.tokensList(token1DeployerAddr).call();
+            const token2Addr = await tokenFactory.methods.tokensList(token2DeployerAddr).call();
+            const token1 = new web3.eth.Contract(VINC.abi, token1Addr);
+            const token2 = new web3.eth.Contract(VINC.abi, token2Addr);
+
+            const tokenExchange = new web3.eth.Contract(TokenExchange.abi, tokenExchangeData.address);
 
             const tokenExchangeAddr = tokenExchangeData.address;
 
             setWeb3(web3);
             setAccounts(loggedInAccount[0]);
-            //setSecondTrader();
+
+            setTokenFactory(tokenFactory);
             setToken1(token1);
             setToken2(token2);
             setTokenExchange(tokenExchange);
             settokenExchangeAddr(tokenExchangeAddr);
-
+            
             const owner1 = await token1.methods.owner().call();
             const owner2 = await token2.methods.owner().call();
             setOwner1(owner1);
             setOwner2(owner2);
-
+            
             if(loggedInAccount[0]===owner1) {
                 setSecondTraderAddr(owner2);
             } else if(loggedInAccount[0]===owner2) {
@@ -87,6 +96,7 @@ const App = () => {
             typeof token1 !== 'undefined'
             && typeof token2 !== 'undefined'
             && typeof tokenExchange !== 'undefined'
+            && typeof tokenFactory !== 'undefined'
             && typeof web3 !== 'undefined'
             && typeof loggedInAccount !== 'undefined'
             && typeof owner1 !== 'undefined'
@@ -94,11 +104,10 @@ const App = () => {
         );
     }
 
+    
     const getBalances = async () => {
     
         if(typeof loggedInAccount !== 'string' || typeof secondTraderAddr !== 'string') return;
-
-        console.log(loggedInAccount, secondTraderAddr);
 
         let yourToken1Balance = await token1.methods.balanceOf(loggedInAccount).call();
         let yourToken2Balance = await token2.methods.balanceOf(loggedInAccount).call();
@@ -143,7 +152,8 @@ const App = () => {
 
     }
 
-    const getCurrentExpectedReturningAmount = async (secondTraderAddr) => {
+    const getCurrentExpectedReturningAmount = async () => {
+        
         const expected_receiving_tokens = await token1.methods
         .expected_receiving_tokens(secondTraderAddr).call();
 
@@ -193,9 +203,7 @@ const App = () => {
 
     const setSecondTrader = () => {
         
-        //return console.log(loggedInAccount);
-
-        const login = loggedInAccount[0] || loggedInAccount;
+        const login = (typeof loggedInAccount=="string") ? loggedInAccount : loggedInAccount[0];
 
         if(login===owner1) {
             setSecondTraderAddr(owner2);
@@ -209,9 +217,11 @@ const App = () => {
 
     useEffect(() => {
         if (isReady()) {
+            web3.eth.defaultAccount = loggedInAccount;
+            setSecondTrader();
             getBalances();
         }
-    }, [loggedInAccount, token1, token2, tokenExchange, web3]);
+    }, [loggedInAccount, secondTraderAddr, token1, token2, tokenExchange, web3]);
 
     if (!isReady()) {
         return "Loading...";

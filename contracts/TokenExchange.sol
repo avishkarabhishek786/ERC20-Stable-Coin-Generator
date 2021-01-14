@@ -24,7 +24,7 @@ contract TokenExchange {
 
     function setTokensToSwap(VINC _token1, VINC _token2) public {
         token1 = _token1; // your/caller's token
-        token2 = _token2; // other party's token
+        token2 = _token2; // second party's token
     }
     
     function _safeTransferFrom(

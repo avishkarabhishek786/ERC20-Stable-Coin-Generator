@@ -4,7 +4,19 @@ const TokenExchange = artifacts.require("TokenExchange");
 
 module.exports = async function (deployer, _network, accounts) {
 
+    let tokenName1 = "Token 1";
+    let tokenName2 = "Token 2";
+    let tokenSymbol1 = "TKN1";
+    let tokenSymbol2 = "TKN2";
+    let initialSupply1 = 1000;
+    let initialSupply2 = 500;
+
     await deployer.deploy(TokenFactory, {from: accounts[0]});
+    const tokenFactory = await TokenFactory.deployed();
+
+    await tokenFactory.createToken(tokenName1, tokenSymbol1, initialSupply1, {from: accounts[1]});
+    await tokenFactory.createToken(tokenName2, tokenSymbol2, initialSupply2, {from: accounts[2]});
+        
 
     //   await deployer.deploy(VINC, "Token 1", "TKN1", 1000, {from: accounts[0]});
 //   const token1 = await VINC.deployed();
