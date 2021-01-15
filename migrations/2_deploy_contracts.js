@@ -14,9 +14,16 @@ module.exports = async function (deployer, _network, accounts) {
     await deployer.deploy(TokenFactory, {from: accounts[0]});
     const tokenFactory = await TokenFactory.deployed();
 
+    await deployer.deploy(TokenExchange, {from: accounts[0]});
+    const tokenExchange = await TokenExchange.deployed();
+
     await tokenFactory.createToken(tokenName1, tokenSymbol1, initialSupply1, {from: accounts[1]});
     await tokenFactory.createToken(tokenName2, tokenSymbol2, initialSupply2, {from: accounts[2]});
         
+
+    console.log("token 1 address", await tokenFactory.tokensList(accounts[1]));
+
+    console.log("token 2 address", await tokenFactory.tokensList(accounts[2]));
 
     //   await deployer.deploy(VINC, "Token 1", "TKN1", 1000, {from: accounts[0]});
 //   const token1 = await VINC.deployed();

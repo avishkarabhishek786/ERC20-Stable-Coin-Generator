@@ -40,19 +40,19 @@ contract VINC is ERC20Pausable, Ownable {
     }
     
     // Set a minimum amount you must receive from buyer address in a trade
-    function set_expected_receiving_tokens(address buyer, uint256 amount) external onlyOwner {
-        require(vinc_owner != address(0), "ERC20: trading from the zero address");
+    function set_expected_receiving_tokens(address buyer, uint256 amount) external {
+        require(_msgSender() != address(0), "ERC20: trading from the zero address");
         require(buyer != address(0), "ERC20: trading to the zero address");
 
-        _expected_receiving_tokens[vinc_owner][buyer] = amount;
-        emit Set_receiving_tokens(vinc_owner, buyer, amount);
+        _expected_receiving_tokens[_msgSender()][buyer] = amount;
+        emit Set_receiving_tokens(_msgSender(), buyer, amount);
     }
     
     event Set_receiving_tokens(address indexed owner, address indexed buyer, uint256 value);
     
     // amount that owner should get from buyer in a trade
-    function expected_receiving_tokens(address buyer) public view returns (uint256) {
-        return _expected_receiving_tokens[vinc_owner][buyer];
+    function expected_receiving_tokens(address receiver, address sender) public view returns (uint256) {
+        return _expected_receiving_tokens[receiver][sender];
     }
     
 }

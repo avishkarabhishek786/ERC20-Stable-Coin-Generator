@@ -105,17 +105,17 @@ contract('TokenFactoryTest', ([account1, account2, account3])=> {
     
         it('should set expected amount', async () => {
             await token1.set_expected_receiving_tokens(account3, 50, {from: account2});
-            let expected_receiving_tokens1 = await token1.expected_receiving_tokens(account3);
+            let expected_receiving_tokens1 = await token1.expected_receiving_tokens(account2, account3);
     
             await token2.set_expected_receiving_tokens(account2, 50, {from: account3});
-            let expected_receiving_tokens2 = await token2.expected_receiving_tokens(account2);
+            let expected_receiving_tokens2 = await token2.expected_receiving_tokens(account3, account2);
     
             assert.equal(expected_receiving_tokens1.toNumber(), 50);
             assert.equal(expected_receiving_tokens2.toNumber(), 50);
         });
     
         it('should swap tokens', async () => {
-            await tokenExchange.swap(account2, 50, account3, 50, {from: account2});
+            await tokenExchange.swap(account2, token1Addr, 50, account3, token2Addr, 50, {from: account2});
             let balanceAcc1 = await token2.balanceOf(account2);
             let balanceAcc2 = await token1.balanceOf(account3);
     
