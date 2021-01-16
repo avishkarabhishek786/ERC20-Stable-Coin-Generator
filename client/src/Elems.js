@@ -19,10 +19,10 @@ export const InfoData = (props) => {
             </div>
             <div className="col-sm">
                 <div className="alert alert-info" role="alert">Expected Return from {props.secondTraderAddr}: {props.currentExpectedReceivingAmount}</div>
-                <div className="alert alert-info" role="alert">loggedInAccountToken1Balance: {props.loggedInAccountToken1Balance}</div>
-                <div className="alert alert-info" role="alert">loggedInAccountToken2Balance: {props.loggedInAccountToken2Balance}</div>
-                <div className="alert alert-info" role="alert">recipientToken1Balance: {props.recipientToken1Balance}</div>
-                <div className="alert alert-info" role="alert">recipientToken2Balance: {props.recipientToken2Balance}</div>
+                <div className="alert alert-info" role="alert">Your Selling Token ({props.sellingTokenName}) balance: {props.loggedInAccountToken1Balance}</div>
+                <div className="alert alert-info" role="alert">Your Buying Token ({props.buyingTokenName}) balance: {props.loggedInAccountToken2Balance}</div>
+                <div className="alert alert-info" role="alert">Recipient Selling Token ({props.buyingTokenName}) balance: {props.recipientToken2Balance}</div>
+                <div className="alert alert-info" role="alert">Recipient Buying Token ({props.sellingTokenName}) balance: {props.recipientToken1Balance}</div>
             </div>
         </>
     )

@@ -5,9 +5,6 @@ import './VINC.sol';
 
 contract TokenExchange {
     
-    // VINC public token1;
-    // VINC public token2;
-    
     string public name = 'ERC20 Tokens Instant Exchange';
  
     event TokensPurchased(
@@ -16,17 +13,7 @@ contract TokenExchange {
         address recipient,
         uint amount
     );
-    
-    // constructor(VINC _token1, VINC _token2) public {
-    //     token1 = _token1;
-    //     token2 = _token2;
-    // }
-
-    // function setTokensToSwap(VINC _token1, VINC _token2) public {
-    //     token1 = _token1; // your/caller's token
-    //     token2 = _token2; // second party's token
-    // }
-    
+        
     function _safeTransferFrom(
         VINC token,
         address sender,
@@ -62,13 +49,13 @@ contract TokenExchange {
         );
         
         require(
-            VINC(token_1).expected_receiving_tokens(owner1, owner2) == amount1,
-            "Token 1 expected amount too low"
+            VINC(token_2).expected_receiving_tokens(owner1, owner2) == amount2,
+            "Token 2 expected amount too low"
         );
 
         require(
-            VINC(token_2).expected_receiving_tokens(owner2, owner1) == amount2,
-            "Token 2 expected amount too low"
+            VINC(token_1).expected_receiving_tokens(owner2, owner1) == amount1,
+            "Token 1 expected amount too low"
         );
         
         _safeTransferFrom(token_1, owner1, owner2, amount1);

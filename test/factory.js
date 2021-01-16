@@ -102,25 +102,27 @@ contract('TokenFactoryTest', ([account1, account2, account3])=> {
             assert.equal(allowance1.toNumber(), 100);
             assert.equal(allowance2.toNumber(), 100);
         });
-    
+
         it('should set expected amount', async () => {
-            await token1.set_expected_receiving_tokens(account3, 50, {from: account2});
-            let expected_receiving_tokens1 = await token1.expected_receiving_tokens(account2, account3);
+            // account2 is expecting to get 40 token2 from account3
+            await token2.set_expected_receiving_tokens(account3, 40, {from: account2});
+            let expected_receiving_tokens2 = await token2.expected_receiving_tokens(account2, account3);
     
-            await token2.set_expected_receiving_tokens(account2, 50, {from: account3});
-            let expected_receiving_tokens2 = await token2.expected_receiving_tokens(account3, account2);
+            // account3 is expecting to get 30 token1 from account2
+            await token1.set_expected_receiving_tokens(account2, 30, {from: account3});
+            let expected_receiving_tokens1 = await token1.expected_receiving_tokens(account3, account2);
     
-            assert.equal(expected_receiving_tokens1.toNumber(), 50);
-            assert.equal(expected_receiving_tokens2.toNumber(), 50);
+            assert.equal(expected_receiving_tokens1.toNumber(), 30);
+            assert.equal(expected_receiving_tokens2.toNumber(), 40);
         });
     
         it('should swap tokens', async () => {
-            await tokenExchange.swap(account2, token1Addr, 50, account3, token2Addr, 50, {from: account2});
-            let balanceAcc1 = await token2.balanceOf(account2);
-            let balanceAcc2 = await token1.balanceOf(account3);
+            await tokenExchange.swap(account2, token1Addr, 30, account3, token2Addr, 40, {from: account2});
+            let balanceAcc1 = await token1.balanceOf(account3);
+            let balanceAcc2 = await token2.balanceOf(account2);
     
-            assert.equal(balanceAcc1.toNumber(), 50);
-            assert.equal(balanceAcc2.toNumber(), 50);
+            assert.equal(balanceAcc1.toNumber(), 30);
+            assert.equal(balanceAcc2.toNumber(), 40);
     
             // assert.equal(result.receipt.status, true);
             // assert.equal(result.logs[0].args.name,zombieNames[0]);

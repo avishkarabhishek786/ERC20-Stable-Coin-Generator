@@ -64,9 +64,8 @@ const App = () => {
         init();
 
         window.ethereum.on('accountsChanged', loginAcc => {
-            console.log("account changed");
             setAccounts(loginAcc[0]);
-            setSecondTraderAddr(undefined);
+            unsetStates();
         });
 
     }, []);
@@ -78,12 +77,15 @@ const App = () => {
         let tk_addr1 = localStorage.getItem("token_addr1"); 
         let tk_addr2 = localStorage.getItem("token_addr2");
 
+        console.log(tk_addr1);
+        console.log(tk_addr2);
+
         if(typeof tk_addr1 == "string" && tk_addr1.length>0
         && tk_addr1 !== "null" && tk_addr1 !== "undefined") {
             setToken_addr1(tk_addr1);
             localStorage.setItem("token_addr1", tk_addr1);
         } else {
-            tk_addr1 = prompt("Enter Token 1 address");
+            tk_addr1 = prompt("Enter Token Address To Sell");
             setToken_addr1(tk_addr1);
             localStorage.setItem("token_addr1", tk_addr1);
         }
@@ -92,7 +94,7 @@ const App = () => {
             setToken_addr2(tk_addr2);
             localStorage.setItem("token_addr2", tk_addr2);
         } else {
-            tk_addr2 = prompt("Enter Token 2 address");
+            tk_addr2 = prompt("Enter Token Address To Buy");
             setToken_addr2(tk_addr2);
             localStorage.setItem("token_addr2", tk_addr2);
         }
@@ -136,6 +138,19 @@ const App = () => {
         loggedInAccount, 
         secondTraderAddr
     ]);
+
+    // Unset everything after account change
+    const unsetStates = () => {
+        setToken1(undefined);
+        setToken2(undefined);
+        setToken1Name(undefined);
+        setToken2Name(undefined);
+        setSecondTraderAddr(undefined);
+        setToken_addr1(undefined);
+        setToken_addr2(undefined);
+        localStorage.setItem("token_addr1", "");
+        localStorage.setItem("token_addr2", "");
+    }
 
     const getBalances = useCallback(async () => {
 
@@ -185,6 +200,10 @@ const App = () => {
     }
 
     const setExpectedReturningAmount = async (expectedAmount) => {
+        console.log(loggedInAccount);
+        console.log(secondTraderAddr);
+        console.log(token2);
+        
         await token2.methods.set_expected_receiving_tokens(secondTraderAddr, expectedAmount)
             .send({
                 from: loggedInAccount
@@ -212,16 +231,6 @@ const App = () => {
         const yourTokenAmountToSend = Number(currentSwapAllowance);
         const receivingTokenAmount = Number(currentExpectedReceivingAmount);
 
-        //return console.log(token_addr1, token_addr2);
-        //console.log(loggedInAccount, token1, yourTokenAmountToSend, secondTraderAddr, token2, receivingTokenAmount);
-
-        //console.log(tokenExchange);
-        //console.log(tokenExchange.methods.swap);
-
-        // let _name = await tokenExchange.methods.name().call();
-        // console.log(_name);
-
-        // return;
         tokenExchange.methods
             .swap(loggedInAccount, token_addr1, yourTokenAmountToSend, secondTraderAddr, token_addr2, receivingTokenAmount)
             .send({ from: loggedInAccount })
@@ -235,15 +244,15 @@ const App = () => {
     }
 
     const setSecondTrader = async() => {
-        console.log(editSecondTraderAddr);
+        if(editSecondTraderAddr.toLowerCase()===loggedInAccount.toLowerCase()) {
+            setError("Buyer and seller cannot be same");
+            return false;
+        }
         setSecondTraderAddr(editSecondTraderAddr);
-        console.log(isReady());
     };    
     
     const changeSecondTraderAddr = async(new_trader_addr) => {
-        console.log(new_trader_addr);
         setEditSecondTraderAddr(old=>old=new_trader_addr);
-        console.log(editSecondTraderAddr);
     };
 
     if (isError) {
@@ -282,6 +291,8 @@ const App = () => {
                             loggedInAccountToken2Balance={loggedInAccountToken2Balance}
                             recipientToken1Balance={recipientToken1Balance}
                             recipientToken2Balance={recipientToken2Balance}
+                            sellingTokenName={token1Name}
+                            buyingTokenName={token2Name}
                         />
                     </div>
                     <div className="card mt-1 mb-1">
@@ -309,9 +320,14 @@ const App = () => {
 
                             <button type="button" className="btn btn-primary mr-2"
                                 onClick={async () => {
-                                    const getAllowance = await token1.methods
+                                    let getAllowance = await token1.methods
                                         .allowance(loggedInAccount, tokenExchangeAddr)
                                         .call();
+
+                                        getAllowance = web3.utils.fromWei(
+                                        getAllowance.toString(),
+                                        'Ether'
+                                    );
 
                                     console.log(getAllowance);
 
@@ -349,12 +365,10 @@ const App = () => {
                                         .expected_receiving_tokens(loggedInAccount, secondTraderAddr)
                                         .call();
 
-                                    // getExpectedReturningAmount = web3.utils.fromWei(
-                                    //     getExpectedReturningAmount.toString(),
-                                    //     'Ether'
-                                    // );
-
-                                    console.log(token2);
+                                    getExpectedReturningAmount = web3.utils.fromWei(
+                                        getExpectedReturningAmount.toString(),
+                                        'Ether'
+                                    );
 
                                     console.log(getExpectedReturningAmount);
                                 }}> Get Expected Returning Amount</button>
@@ -372,25 +386,6 @@ const App = () => {
                             >SWAP</button>
                         </div>
                     </div>
-
-
-                            <button type="button" className="btn btn-primary mr-2"
-                                onClick={async () => {
-                                    let towner1 = await token1.methods
-                                        .owner()
-                                        .call();
-
-                                    console.log(towner1);
-                                }}> Token owner 1</button>
-
-                            <button type="button" className="btn btn-primary mr-2"
-                                onClick={async () => {
-                                    let towner2 = await token2.methods
-                                        .owner()
-                                        .call();
-
-                                    console.log(towner2);
-                                }}>  Token owner 2</button>
 
                 </div>
             </>
