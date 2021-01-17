@@ -4,12 +4,12 @@ const TokenExchange = artifacts.require("TokenExchange");
 
 module.exports = async function (deployer, _network, accounts) {
 
-    let tokenName1 = "Token 1";
-    let tokenName2 = "Token 2";
-    let tokenSymbol1 = "TKN1";
-    let tokenSymbol2 = "TKN2";
-    let initialSupply1 = 1000;
-    let initialSupply2 = 500;
+    let tokenName1 = "Alice Token";
+    let tokenName2 = "Bob  Token";
+    let tokenSymbol1 = "ALC";
+    let tokenSymbol2 = "BOB";
+    let initialSupply1 = web3.utils.toWei('1000000000', 'Ether'); 
+    let initialSupply2 = web3.utils.toWei('5000000000', 'Ether');
 
     await deployer.deploy(TokenFactory, {from: accounts[0]});
     const tokenFactory = await TokenFactory.deployed();

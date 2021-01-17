@@ -140,7 +140,7 @@ const App = () => {
     ]);
 
     // Unset everything after account change
-    const unsetStates = () => {
+    const unsetStates = useCallback(() => {
         setToken1(undefined);
         setToken2(undefined);
         setToken1Name(undefined);
@@ -150,16 +150,16 @@ const App = () => {
         setToken_addr2(undefined);
         localStorage.setItem("token_addr1", "");
         localStorage.setItem("token_addr2", "");
-    }
+    }, []);
 
     const getBalances = useCallback(async () => {
 
         if (typeof loggedInAccount !== 'string' || typeof secondTraderAddr !== 'string') return;
 
-        let yourToken1Balance = await token1.methods.balanceOf(loggedInAccount).call();
-        let yourToken2Balance = await token2.methods.balanceOf(loggedInAccount).call();
-        let recipientToken1Balance = await token1.methods.balanceOf(secondTraderAddr).call();
-        let recipientToken2Balance = await token2.methods.balanceOf(secondTraderAddr).call();
+        let yourToken1Balance = web3.utils.fromWei(await token1.methods.balanceOf(loggedInAccount).call(), 'Ether');
+        let yourToken2Balance = web3.utils.fromWei(await token2.methods.balanceOf(loggedInAccount).call(), 'Ether');
+        let recipientToken1Balance = web3.utils.fromWei(await token1.methods.balanceOf(secondTraderAddr).call(), 'Ether');
+        let recipientToken2Balance = web3.utils.fromWei(await token2.methods.balanceOf(secondTraderAddr).call(), 'Ether');
 
         setLoggedInAccountToken1Balance(yourToken1Balance);
         setLoggedInAccountToken2Balance(yourToken2Balance);
@@ -171,14 +171,15 @@ const App = () => {
     }, [loggedInAccount, secondTraderAddr]);
 
     const getCurrentAllowance = async () => {
-        const getAllowance = await token1.methods
+        const getAllowance = web3.utils.fromWei(await token1.methods
             .allowance(loggedInAccount, tokenExchangeAddr)
-            .call();
+            .call(), 'Ether');
 
         setCurrentSwapAllowance(getAllowance);
     }
 
     const approveTokens = (amount) => {
+        amount = web3.utils.toWei(amount.toString(), 'Ether');
         token1.methods.approve(tokenExchangeAddr, amount).send({
             from: loggedInAccount
         }).on('receipt', async (receipt) => {
@@ -193,17 +194,15 @@ const App = () => {
 
     const getCurrentExpectedReturningAmount = async () => {
 
-        const exp_receiving_tokens = await token2.methods
-            .expected_receiving_tokens(loggedInAccount, secondTraderAddr).call();
+        const exp_receiving_tokens = web3.utils.fromWei(await token2.methods
+            .expected_receiving_tokens(loggedInAccount, secondTraderAddr).call(), 'Ether');
 
         setCurrentExpectedReceivingAmount(exp_receiving_tokens);
     }
 
     const setExpectedReturningAmount = async (expectedAmount) => {
-        console.log(loggedInAccount);
-        console.log(secondTraderAddr);
-        console.log(token2);
         
+        expectedAmount = web3.utils.toWei(expectedAmount.toString(), 'Ether');
         await token2.methods.set_expected_receiving_tokens(secondTraderAddr, expectedAmount)
             .send({
                 from: loggedInAccount
@@ -228,8 +227,8 @@ const App = () => {
             return;
         }
 
-        const yourTokenAmountToSend = Number(currentSwapAllowance);
-        const receivingTokenAmount = Number(currentExpectedReceivingAmount);
+        const yourTokenAmountToSend = web3.utils.toWei(currentSwapAllowance.toString(), 'Ether');
+        const receivingTokenAmount = web3.utils.toWei(currentExpectedReceivingAmount.toString(), 'Ether');
 
         tokenExchange.methods
             .swap(loggedInAccount, token_addr1, yourTokenAmountToSend, secondTraderAddr, token_addr2, receivingTokenAmount)
@@ -325,7 +324,7 @@ const App = () => {
                                         .call();
 
                                         getAllowance = web3.utils.fromWei(
-                                        getAllowance.toString(),
+                                            getAllowance.toString(),
                                         'Ether'
                                     );
 
