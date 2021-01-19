@@ -3,6 +3,7 @@ import {Routes, Route} from "react-router-dom";
 import Home from "./Home";
 import NewToken from "./NewToken";
 import Swap from "./Swap";
+import Wallet from "./Wallet";
 
 const App = () => {
     return (
@@ -10,6 +11,7 @@ const App = () => {
             <Route path="/" element={<Home/>} />
             <Route path="/new_token" element={<NewToken />} />
             <Route path="/swap" element={<Swap />} />
+            <Route path="/wallet" element={<Wallet />} />
             <Route path="*" element={<Home />} />
         </Routes>
     )

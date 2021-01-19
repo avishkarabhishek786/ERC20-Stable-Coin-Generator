@@ -20,6 +20,9 @@ export const Navbar = () => {
                 <li className="nav-item">
                     <Link className="nav-link" to="/swap">Swap Tokens</Link>
                 </li>
+                <li className="nav-item">
+                    <Link className="nav-link" to="/wallet">Wallet</Link>
+                </li>
             </ul>
             </div>
         </div>
@@ -170,3 +173,11 @@ export const NewTokenUI = (props) => {
         </>
     )
 }
+
+export const WalletUI = (props) => {
+    return (
+        <>
+            <p>Wallet</p>
+        </>
+    );
+};

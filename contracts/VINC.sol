@@ -10,7 +10,7 @@ contract VINC is ERC20Pausable, Ownable {
     address private vinc_owner;
     
     mapping (address => mapping (address => uint256)) private _expected_receiving_tokens;
-    
+
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public payable ERC20(_name, _symbol) {
         require(tx.origin != address(0), "Token creator is not a valid address.");
         // Since this token is actually created by TokenFactory msg.sender is TokenFactory 
