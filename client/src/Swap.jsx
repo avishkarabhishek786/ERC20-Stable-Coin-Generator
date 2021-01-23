@@ -70,37 +70,6 @@ const Swap = () => {
 
     }, []);
 
-    // useEffect(() => {
-        
-    //     if(web3===undefined) return;
-        
-    //     let tk_addr1 = localStorage.getItem("token_addr1"); 
-    //     let tk_addr2 = localStorage.getItem("token_addr2");
-
-    //     console.log(tk_addr1);
-    //     console.log(tk_addr2);
-
-    //     if(typeof tk_addr1 == "string" && tk_addr1.length>0
-    //     && tk_addr1 !== "null" && tk_addr1 !== "undefined") {
-    //         setToken_addr1(tk_addr1);
-    //         localStorage.setItem("token_addr1", tk_addr1);
-    //     } else {
-    //         tk_addr1 = prompt("Enter Token Address To Sell");
-    //         setToken_addr1(tk_addr1);
-    //         localStorage.setItem("token_addr1", tk_addr1);
-    //     }
-    //     if(typeof tk_addr2 == "string" && tk_addr2.length>0
-    //     && tk_addr2 !== "null" && tk_addr2 !== "undefined") {
-    //         setToken_addr2(tk_addr2);
-    //         localStorage.setItem("token_addr2", tk_addr2);
-    //     } else {
-    //         tk_addr2 = prompt("Enter Token Address To Buy");
-    //         setToken_addr2(tk_addr2);
-    //         localStorage.setItem("token_addr2", tk_addr2);
-    //     }
-
-    // }, [token_addr1, token_addr2, web3, secondTraderAddr]);
-
     const isReady = useCallback(() => {
         console.log(token1);
         console.log(token2);

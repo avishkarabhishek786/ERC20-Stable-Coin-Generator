@@ -82,42 +82,42 @@ const Wallet = () => {
         )
     }
 
-    const getTOkenBalance = (state, action) => {
-        switch (action.type) {
-            case "increment1":
-                return { ...state, firstCounterValue: state.firstCounterValue + action.value };
-            case "decrement1":
-                return { ...state, firstCounterValue: state.firstCounterValue - action.value };
-            case "increment5":
-                return { ...state, secondCounterValue: state.secondCounterValue + action.value};
-            case "decrement5":
-                return { ...state, secondCounterValue: state.secondCounterValue - action.value};
-            case "reset":
-                return walletQuery;
+    // const getTOkenBalance = (state, action) => {
+    //     switch (action.type) {
+    //         case "increment1":
+    //             return { ...state, firstCounterValue: state.firstCounterValue + action.value };
+    //         case "decrement1":
+    //             return { ...state, firstCounterValue: state.firstCounterValue - action.value };
+    //         case "increment5":
+    //             return { ...state, secondCounterValue: state.secondCounterValue + action.value};
+    //         case "decrement5":
+    //             return { ...state, secondCounterValue: state.secondCounterValue - action.value};
+    //         case "reset":
+    //             return walletQuery;
     
-            default:
-                return state;
-        }
-    }
+    //         default:
+    //             return state;
+    //     }
+    // }
     
-    const CounterObj = () => {
+    // const CounterObj = () => {
         
-        const [count, dispatch] = useReducer(getTOkenBalance, walletQuery);
-        return (
-            <>
-                <p>firstCounterValue: {count.firstCounterValue}</p>
-                <p>secondCounterValue: {count.secondCounterValue}</p>
+    //     const [count, dispatch] = useReducer(getTOkenBalance, walletQuery);
+    //     return (
+    //         <>
+    //             <p>firstCounterValue: {count.firstCounterValue}</p>
+    //             <p>secondCounterValue: {count.secondCounterValue}</p>
                
-                <button onClick={() => { dispatch({ type: "increment1", value:1 }) }}>Increment</button>
-                <button onClick={() => { dispatch({ type: "decrement1", value:1  }) }}>Decrement</button>
+    //             <button onClick={() => { dispatch({ type: "increment1", value:1 }) }}>Increment</button>
+    //             <button onClick={() => { dispatch({ type: "decrement1", value:1  }) }}>Decrement</button>
     
-                <button onClick={() => { dispatch({ type: "increment5", value:5 }) }}>Increment 5</button>
-                <button onClick={() => { dispatch({ type: "decrement5", value:5  }) }}>Decrement 5</button>
+    //             <button onClick={() => { dispatch({ type: "increment5", value:5 }) }}>Increment 5</button>
+    //             <button onClick={() => { dispatch({ type: "decrement5", value:5  }) }}>Decrement 5</button>
     
-                <button onClick={() => { dispatch({ type: "reset" }) }}>Reset</button>
-            </>
-        );
-    }
+    //             <button onClick={() => { dispatch({ type: "reset" }) }}>Reset</button>
+    //         </>
+    //     );
+    // }
     
 
 

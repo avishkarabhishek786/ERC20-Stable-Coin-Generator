@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
@@ -22,6 +22,9 @@ export const Navbar = () => {
                 </li>
                 <li className="nav-item">
                     <Link className="nav-link" to="/wallet">Wallet</Link>
+                </li>
+                <li className="nav-item">
+                    <Link className="nav-link" to="/buy">Buy Tokens</Link>
                 </li>
             </ul>
             </div>
@@ -178,6 +181,76 @@ export const WalletUI = (props) => {
     return (
         <>
             <p>Wallet</p>
+        </>
+    );
+};
+
+export const PaypalUI = (props) => {
+
+    const [numberOfTokens, setNumberOfTokens] = useState(0);
+    const [paid, setPaid] = React.useState(false);
+    const [error, setError] = React.useState(null);
+
+    const paypalBtn = useRef();
+
+    useEffect(()=>{
+        window.paypal.Buttons({
+            createOrder: function(data, actions) {
+              // This function sets up the details of the transaction, including the amount and line item details.
+              return actions.order.create({
+                intent:"CAPTURE",  
+                purchase_units: [{
+                  description: "Enter USD amount to buy EDGE stable coin",  
+                  amount: {
+                    currency_code: "USD",  
+                    value: document.getElementById("numberOfTokensIp").value
+                  }
+                }]
+              });
+            },
+            onApprove: function(data, actions) {
+              // This function captures the funds from the transaction.
+              return actions.order.capture().then(function(details) {
+                // This function shows a transaction success message to your buyer.
+                console.log(details);   
+                setPaid(true);
+                alert('Transaction completed by ' + details.payer.name.given_name);
+              });
+            },
+            onError: function(err) {
+                console.log(err);
+                setError(err);
+            }
+          }).render(paypalBtn.current);
+    }, []);
+
+      // If the payment has been made
+        if (paid) {
+            return <div>Payment successful.!</div>;
+        }
+
+        // If any error occurs
+        if (error) {
+            return <div>Error Occurred in processing payment.! Please try again.</div>;
+        }
+
+    return (
+        <>
+            <div className="card d-flex justify-content-center mg-top">
+                <div className="card-header">
+                    Checkout to purchase EDGE stable coins.
+            </div>
+                <p>You are buying {numberOfTokens} EDGE tokens.</p>
+                <input type="text" className="form form-control" 
+                id="numberOfTokensIp"
+                value={numberOfTokens}
+                onChange={(e)=>{
+                    setNumberOfTokens(e.target.value);
+                }} />
+                <div className="card-body">
+                    <div ref={paypalBtn} />
+                </div>
+            </div>
         </>
     );
 };

@@ -4,6 +4,7 @@ import Home from "./Home";
 import NewToken from "./NewToken";
 import Swap from "./Swap";
 import Wallet from "./Wallet";
+import Paypal from "./Paypal";
 
 const App = () => {
     return (
@@ -12,6 +13,7 @@ const App = () => {
             <Route path="/new_token" element={<NewToken />} />
             <Route path="/swap" element={<Swap />} />
             <Route path="/wallet" element={<Wallet />} />
+            <Route path="/buy" element={<Paypal />} />
             <Route path="*" element={<Home />} />
         </Routes>
     )

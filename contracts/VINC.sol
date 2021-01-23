@@ -7,9 +7,23 @@ import '@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol';
 
 contract VINC is ERC20Pausable, Ownable {
 
-    address private vinc_owner;
+    address private initiator;
+    address private cashier;
+
+    modifier onlyInitiator() {
+        require(msg.sender==initiator);
+        _;
+    }
+
+    modifier onlyCashier() {
+        require(msg.sender==cashier);
+        _;
+    }
     
     mapping (address => mapping (address => uint256)) private _expected_receiving_tokens;
+
+    event Set_receiving_tokens(address indexed owner, address indexed buyer, uint256 value);
+    event Token_purchase_through_fiat(address indexed sender, address indexed recipient, uint256 amount);
 
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public payable ERC20(_name, _symbol) {
         require(tx.origin != address(0), "Token creator is not a valid address.");
@@ -18,7 +32,6 @@ contract VINC is ERC20Pausable, Ownable {
         // So ownership and initial tokens are transferred to tx.origin
         transferOwnership(tx.origin);
         _mint(tx.origin, _initialSupply);
-        vinc_owner = tx.origin;
     }
     
     function transfer(address recipient, uint256 amount) public virtual override whenNotPaused returns (bool) {
@@ -48,11 +61,20 @@ contract VINC is ERC20Pausable, Ownable {
         emit Set_receiving_tokens(_msgSender(), buyer, amount);
     }
     
-    event Set_receiving_tokens(address indexed owner, address indexed buyer, uint256 value);
-    
     // amount that owner should get from buyer in a trade
     function expected_receiving_tokens(address receiver, address sender) public view returns (uint256) {
         return _expected_receiving_tokens[receiver][sender];
+    }
+
+    function setCashier(address _cashier) public onlyInitiator {
+        cashier = _cashier;
+    }
+
+    // function to buy for USD
+    function fiat_buy(address sender, address recipient, uint256 amount) external onlyCashier returns (bool) {
+        transferFrom(sender, recipient, amount);
+        emit Token_purchase_through_fiat(sender, recipient, amount);
+        return true;
     }
     
 }
