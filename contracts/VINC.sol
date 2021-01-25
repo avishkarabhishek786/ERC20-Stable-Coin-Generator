@@ -4,8 +4,9 @@ pragma solidity >=0.6.0 <0.8.0;
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
 
-contract VINC is ERC20Pausable, Ownable {
+contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
 
     address private initiator;
     address private cashier;
@@ -23,7 +24,8 @@ contract VINC is ERC20Pausable, Ownable {
     mapping (address => mapping (address => uint256)) private _expected_receiving_tokens;
 
     event Set_receiving_tokens(address indexed owner, address indexed buyer, uint256 value);
-    event Token_purchase_through_fiat(address indexed sender, address indexed recipient, uint256 amount);
+    event Token_purchase_through_fiat(address indexed recipient, uint256 amount);
+    event Token_sale_through_fiat(address indexed recipient, uint256 amount);
 
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public payable ERC20(_name, _symbol) {
         require(tx.origin != address(0), "Token creator is not a valid address.");
@@ -31,7 +33,7 @@ contract VINC is ERC20Pausable, Ownable {
         // But we want the owner to be person who called TokenFactory i.e tx.origin 
         // So ownership and initial tokens are transferred to tx.origin
         transferOwnership(tx.origin);
-        _mint(tx.origin, _initialSupply);
+        _mint(tx.origin, _initialSupply * (10 ** uint256(decimals())));
     }
     
     function transfer(address recipient, uint256 amount) public virtual override whenNotPaused returns (bool) {
@@ -66,14 +68,28 @@ contract VINC is ERC20Pausable, Ownable {
         return _expected_receiving_tokens[receiver][sender];
     }
 
+    // required for token to be burnable and pausable both
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20, ERC20Pausable) {
+        super._beforeTokenTransfer(from, to, amount);
+    }
+
     function setCashier(address _cashier) public onlyInitiator {
         cashier = _cashier;
     }
 
     // function to buy for USD
-    function fiat_buy(address sender, address recipient, uint256 amount) external onlyCashier returns (bool) {
-        transferFrom(sender, recipient, amount);
-        emit Token_purchase_through_fiat(sender, recipient, amount);
+    function fiat_buy(address recipient, uint256 amount) external onlyCashier returns (bool) {
+        require(amount>0, "Token minted must be greater than 0");
+        _mint(recipient, amount);
+        emit Token_purchase_through_fiat(recipient, amount);
+        return true;
+    }
+
+    // function to sell tokens for USD
+    function fiat_redeem(address recipient, uint256 amount) external onlyCashier returns (bool) {
+        require(amount>0, "Cash amount must be greater than 0");
+        _burn(recipient, amount);
+        emit Token_sale_through_fiat(recipient, amount);
         return true;
     }
     
