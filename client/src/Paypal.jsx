@@ -68,13 +68,28 @@ const Paypal = () => {
 
     const [checkout, setCheckout] = useState(false);
 
+    const sendPurchaseDetailToCashier = (puchase_data) => {
+        // Simple POST request with a JSON body using fetch
+        puchase_data.purchaser_eth_address = loggedInAccount;
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ puchase_data })
+        };
+        fetch('http://localhost:8073/contractFunction/fiat_buy', requestOptions)
+            .then(response => response.json())
+            .then(data => console.log(data));
+    }
+
     return (
         <>
             <Navbar />
             <div className="container">
                 <div className="Paypal">
                     {checkout ?
-                        <PaypalUI />
+                        <PaypalUI 
+                            sendPurchaseDetailToCashier={sendPurchaseDetailToCashier}
+                        />
                         :
                         <button type="button" onClick={() => setCheckout(true)} >
                         Checkout

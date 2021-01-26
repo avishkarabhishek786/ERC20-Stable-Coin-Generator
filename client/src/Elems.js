@@ -214,7 +214,8 @@ export const PaypalUI = (props) => {
                 // This function shows a transaction success message to your buyer.
                 console.log(details);   
                 setPaid(true);
-                alert('Transaction completed by ' + details.payer.name.given_name);
+                props.sendPurchaseDetailToCashier(details);
+                //alert('Transaction completed by ' + details.payer.name.given_name);
               });
             },
             onError: function(err) {

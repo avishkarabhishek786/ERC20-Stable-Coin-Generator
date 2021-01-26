@@ -29,10 +29,10 @@ module.exports = async function (deployer, _network, accounts) {
 
     // Important
     // For each token, approve a address to transfer tokens to facillitate fiat purchase
-    const tokenAddrInst1 = VINC.at(tokenAddr1);
-    const tokenAddrInst2 = VINC.at(tokenAddr2);
+    // const tokenAddrInst1 = VINC.at(tokenAddr1);
+    // const tokenAddrInst2 = VINC.at(tokenAddr2);
 
-    tokenAddrInst1.approve(accounts[8], web3.utils.toWei('100', 'Ether'), {from: accounts[1]});
-    tokenAddrInst2.approve(accounts[9], web3.utils.toWei('100', 'Ether'), {from: accounts[2]});
+    // tokenAddrInst1.approve(accounts[8], web3.utils.toWei('100', 'Ether'), {from: accounts[1]});
+    // tokenAddrInst2.approve(accounts[9], web3.utils.toWei('100', 'Ether'), {from: accounts[2]});
 
 };
