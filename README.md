@@ -1,3 +1,3 @@
-# ERC20 Tokens Swapper
+# ERC20 Stable Coin Generator
 
-A dapp to create ERC20 tokens and trade against each other.
+A dapp to create ERC20 stable coins which can be traded for and against USD.
