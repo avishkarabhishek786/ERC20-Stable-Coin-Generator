@@ -1,14 +1,14 @@
 {
-  "name": "erc20_tokens_swapper",
+  "name": "erc20-stable-coin-generator",
   "version": "0.0.1",
-  "description": "Solidity smart contract for swapping erc20 tokens",
+  "description": "Solidity smart contract for generating erc20 stable coins.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avishkarabhishek786/ERC20-Tokens-Swapper.git"
+    "url": "git+https://github.com/avishkarabhishek786/ERC20-Stable-Coin-Generator.git"
   },
   "keywords": [
     "ethereum",
@@ -18,9 +18,9 @@
   "author": "Abhishek Sinha",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/avishkarabhishek786/ERC20-Tokens-Swapper/issues"
+    "url": "https://github.com/avishkarabhishek786/ERC20-Stable-Coin-Generator/issues"
   },
-  "homepage": "https://github.com/avishkarabhishek786/ERC20-Tokens-Swapper#readme",
+  "homepage": "https://github.com/avishkarabhishek786/ERC20-Stable-Coin-Generator#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^3.3.0"
   }

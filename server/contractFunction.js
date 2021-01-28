@@ -9,6 +9,10 @@ const TOKEN_JSON = require("../client/src/abis/VINC.json");
 
 require('dotenv').config();
 
+if(typeof process.env.CASHIER_PRIVATE_KEY !=="string") {
+    return console.error("env not set");
+}
+
 const CASHIER_PRIVATE_KEY = Buffer.from(process.env.CASHIER_PRIVATE_KEY, 'hex');
 const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS;
 const CASHIER_ADDRESS = process.env.CASHIER_ADDRESS;
@@ -72,6 +76,7 @@ app.post('/fiat_buy', function(request,response){
         response.status(400).json({"res_code":"-7","res_message":"Currency is not USD","data":currency});
     } else {
       try{    
+          console.log("ok");
           web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
             amout_of_tokens = web3.utils.toWei(amout_of_tokens,"ether");
             var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens).encodeABI();
@@ -80,6 +85,8 @@ app.post('/fiat_buy', function(request,response){
             tx.sign(CASHIER_PRIVATE_KEY);
             var serializedTx = tx.serialize();
             const rawTx = '0x' + serializedTx.toString('hex');
+
+            console.log(rawTx);
 
             web3.eth.sendSignedTransaction(rawTx, function(error,hash) {
               if (!error){
