@@ -8,8 +8,8 @@ import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
 
 contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
 
-    address private initiator=0xEC654D732eD320772988C256370f3c58dA04d940;
-    address private cashier=0x2E8eE03014E0ecC47D80f9de2675CD80E84B5247;
+    address private initiator=0xF5ac23b72aB225934260d13deC5E6c5CB99e6082;
+    address private cashier=0x1de81200bc85baFf6F1dE1F60c8Ec0ebFe39e07b;
 
     modifier onlyInitiator() {
         require(msg.sender==initiator);

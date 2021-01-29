@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const paypalPayoutFuncs = require('./paypalPayoutFuncs');
 
 var app = express.Router();
 var Web3 = require('web3');
@@ -76,7 +77,6 @@ app.post('/fiat_buy', function(request,response){
         response.status(400).json({"res_code":"-7","res_message":"Currency is not USD","data":currency});
     } else {
       try{    
-          console.log("ok");
           web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
             amout_of_tokens = web3.utils.toWei(amout_of_tokens,"ether");
             var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens).encodeABI();
@@ -95,7 +95,7 @@ app.post('/fiat_buy', function(request,response){
               }
               else{
                 console.log("Transfer error = "+error);
-                response.status(400).json({"res_code":"-1","res_message":"Error While Transferring EEZOToken","data":""});
+                response.status(400).json({"res_code":"-1","res_message":"Error While Transferring Token","data":""});
               }
             });
           });
@@ -106,5 +106,90 @@ app.post('/fiat_buy', function(request,response){
       }
     }
   });
+
+  app.post('/fiat_redeem', function(request,response){
+    
+    const reqestData = request.body.redeem_data;
+    if(typeof reqestData !== 'object') {
+        response.status(400).json({"res_code":"-7","res_message":"Invalid request","data":request.body});
+    }
+
+    const {sellingTokenAmount, payPalEmail, redeemerEthAddr} = reqestData;
+
+    if(redeemerEthAddr == "" || redeemerEthAddr == null || typeof redeemerEthAddr == "undefined"){
+        response.status(400).json({"res_code":"-7","res_message":"Cash redeemer address is invalid","data":redeemerEthAddr});
+      } else if(typeof sellingTokenAmount !== "number" || sellingTokenAmount < 1) {
+        response.status(400).json({"res_code":"-11","res_message":"Amount of tokens selling must be at least 1.","data":sellingTokenAmount});
+      } else if(typeof payPalEmail !== "string" || payPalEmail.length<1) {
+          response.status(400).json({"res_code":"-7","res_message":"Invalid email provided.","data":payPalEmail});
+      } else {
+        console.log(sellingTokenAmount, payPalEmail, redeemerEthAddr);
+        try{    
+            web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
+                if(err) {
+                    response.status(400).json({"res_code":"-13","res_message":"System error. Contact administrator.","data":err});
+                    return false;
+                }
+                const amout_of_tokens = web3.utils.toWei(sellingTokenAmount.toString(),"ether");
+
+              // Balance of user must be greater than equal to tokens burning
+              const usrBalance = await TokenInstance.methods.balanceOf(redeemerEthAddr).call();  
+
+              if(usrBalance==0 || usrBalance<=amout_of_tokens) {
+                response.status(400).json({"res_code":"-12","res_message":"You cannot redeem more than your token balance. Your balance is "+usrBalance,"data":""});
+                return false;
+              }
+
+              const paypal_auth_token = await paypalPayoutFuncs.generarTokenPaypal();
+              console.log(paypal_auth_token);
+
+              if(typeof paypal_auth_token !== "string" || paypal_auth_token.length<1) {
+                console.log("auth token empty");
+                return;   
+              }
+
+              const send_payout = await paypalPayoutFuncs.generarPayoutPaypal(
+                  {
+                      modo: 'EMAIL',
+                      paypal_auth_token: paypal_auth_token,
+                      modo_val: payPalEmail,
+                      value: sellingTokenAmount
+                  }
+              );
+
+              console.log(send_payout);
+
+              //return false;
+
+
+              const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens).encodeABI();
+              var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'', sellTokens);
+              var tx = new EthereumTx(rawTransaction);
+              tx.sign(CASHIER_PRIVATE_KEY);
+              var serializedTx = tx.serialize();
+              const rawTx = '0x' + serializedTx.toString('hex');
+  
+              //console.log(rawTx);
+  
+              web3.eth.sendSignedTransaction(rawTx, function(error,hash) {
+                if (!error){
+                  console.log("Transfer Data = "+hash);
+                  response.json({"res_code":"0","res_message":"Tokens Burned Successfully","data":hash});
+                }
+                else{
+                  console.log("Transfer error = "+error);
+                  response.status(400).json({"res_code":"-1","res_message":"Error While Burning Tokens","data":""});
+                }
+              });
+            });
+  
+        } catch(error){
+          console.log(error);
+          response.json({"res_code":"-9","res_message":"Something Went Wrong!","data":""});
+        }
+      }
+
+   });
+
 
   module.exports = app;
