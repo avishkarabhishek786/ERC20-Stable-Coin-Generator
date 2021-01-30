@@ -28,6 +28,9 @@ export const Navbar = () => {
                 <li className="nav-item">
                     <Link className="nav-link" to="/buy">Buy Tokens</Link>
                 </li>
+                <li className="nav-item">
+                    <Link className="nav-link" to="/redeem_cash">Redeem Cash</Link>
+                </li>
             </ul>
             </div>
         </div>

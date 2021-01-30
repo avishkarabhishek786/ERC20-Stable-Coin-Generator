@@ -61,7 +61,7 @@ const generarTokenPaypal = async function(){
 const generarPayoutPaypal = async function(params){
 
     //Params son los paremtros que recibe el cuerpo de la peticion
-    console.log(params);
+    //console.log(params);
     let modo       = params.modo;//modo debne ser EMAIL, TELEFONO, PAYPAL ID
     //Dependiendo esta la logica de la peticion cambiara
     let batch_code = uniqid(); //Este codigo lo genere por que cada peticion 
@@ -82,26 +82,24 @@ const generarPayoutPaypal = async function(params){
       }
     };
     
-    //Doc payouts paypal
-    //Handler de request a su api
-    //INCIO PETICION
-    var req = http.request(options, function (res) {
-      var chunks = [];
-    
-      res.on("data", function (chunk) {
-        chunks.push(chunk);
-      });
-    
-      res.on("end", function () {
-        var body = Buffer.concat(chunks);
-        console.log(body.toString());//Esto te imprime tu respuesta
-        return body.toString();
-      });
-    });
-
-    /*
-    
-    //Si modo es tipo EMAIL
+    const payout = function(options) {
+        return new Promise((resolve, reject) => {
+            let req = http.request(options, function (res) {
+                var chunks = [];
+                
+                res.on("data", function (chunk) {
+                    chunks.push(chunk);
+                });
+            
+                res.on("end", function () {
+                var body = Buffer.concat(chunks);
+                //console.log(body.toString());//Esto te imprime tu respuesta
+                //return body.toString();
+                    return resolve(body.toString());
+                });
+            });
+            
+            //Si modo es tipo EMAIL
     if (modo == 'EMAIL') {
         
         let email          = params.modo_val;//destinatario
@@ -121,12 +119,10 @@ const generarPayoutPaypal = async function(params){
              
             ] }));
          req.end();//FIN DE PETICION
-         
+
+         //console.log(JSON.stringify(req.outputData));
          //regresar respuesta al front
-         return {
-            status : 'success',
-            message: "Payment made to: " +email
-          }
+        
     }
     //Si modo es tipo TELEFONO
     if (modo == 'TELEFONO') {
@@ -149,11 +145,6 @@ const generarPayoutPaypal = async function(params){
             ] }));
          req.end();
          
-         
-         return {
-            status : 'success',
-            message: "Payment made to: " + telefono
-          }
     }
     //Si modo es tipo PAYPAL_ID
     if (modo == 'PAYPAL_ID') {
@@ -173,15 +164,14 @@ const generarPayoutPaypal = async function(params){
             ] }));
          req.end();
          
-         
-         return {
-            status : 'success',
-            message: "Payment made to: " + paypal_id
-          }
     }
+    
 
-    */
-
+        });
+    };
+    
+    let send_payout = await payout(options);
+    return send_payout;
     
   }
 

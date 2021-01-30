@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './Elems';
 import "./index.css";
 import { getWeb3 } from "./utils";
@@ -58,7 +58,6 @@ const RedeemCash = () => {
     const sendRedeemCashRequest = (e) => {
         
         e.preventDefault();
-        console.log('clicked');
         const sellingTokenAmount = Number(document.getElementById('numberOfTokensIp').value);
         const payPalEmail = document.getElementById('paypalEmailIp').value;
 
@@ -93,13 +92,17 @@ const RedeemCash = () => {
                         msg: cashier_response.res_message
                     });
 
+                    showMessage(`${cashier_response.res_message}`, false);
+
                 } else {
                     
-                    //showMessage(`${cashier_response.res_message} Tx hash: ${cashier_response.data}`, true);
+                    showMessage(`${cashier_response.res_message} Tx hash: ${cashier_response.data}`, true);
                     // setCashRedeem({
                     //     status: true,
                     //     tx: cashier_response.data
                     // });
+
+
                 }
             });
     }

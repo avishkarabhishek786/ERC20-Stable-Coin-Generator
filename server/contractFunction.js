@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const BigNumber = require('bignumber.js');
 const paypalPayoutFuncs = require('./paypalPayoutFuncs');
 
 var app = express.Router();
@@ -135,20 +136,23 @@ app.post('/fiat_buy', function(request,response){
               // Balance of user must be greater than equal to tokens burning
               const usrBalance = await TokenInstance.methods.balanceOf(redeemerEthAddr).call();  
 
-              if(usrBalance==0 || usrBalance<=amout_of_tokens) {
+              let usrBalanceBigNumber = new BigNumber(usrBalance).toNumber();
+              let amout_of_tokensBigNumber = new BigNumber(amout_of_tokens).toNumber();
+              
+              if(usrBalance==0 || usrBalanceBigNumber<amout_of_tokensBigNumber) {
                 response.status(400).json({"res_code":"-12","res_message":"You cannot redeem more than your token balance. Your balance is "+usrBalance,"data":""});
                 return false;
               }
 
               const paypal_auth_token = await paypalPayoutFuncs.generarTokenPaypal();
-              console.log(paypal_auth_token);
+              //console.log(paypal_auth_token);
 
               if(typeof paypal_auth_token !== "string" || paypal_auth_token.length<1) {
                 console.log("auth token empty");
                 return;   
               }
 
-              const send_payout = await paypalPayoutFuncs.generarPayoutPaypal(
+              let send_payout = await paypalPayoutFuncs.generarPayoutPaypal(
                   {
                       modo: 'EMAIL',
                       paypal_auth_token: paypal_auth_token,
@@ -157,10 +161,31 @@ app.post('/fiat_buy', function(request,response){
                   }
               );
 
-              console.log(send_payout);
+              if(typeof send_payout =="string") {
+                send_payout = JSON.parse(send_payout);
+              }
+              
+              let cash_transferred = false;
 
-              //return false;
+              if(typeof send_payout == "object") {
+                  if(typeof send_payout.batch_header=="object" && typeof send_payout.batch_header.payout_batch_id=="string") {
+                    console.log("Success");
+                    cash_transferred = true;
+                    // Success: Move to smart contract part
+                  } else {
+                    console.warn(send_payout.message);
+                    // Send error message back to user.
+                    response.json({"res_code":"-14","res_message":"Failed to transfer cash! Please try again.","data":send_payout});
+                  }
+              } else {
+                console.warn("Invalid response");
+                response.json({"res_code":"-14","res_message":"Failed to transfer cash! Please try again.","data":""});
+              }
 
+              if(!cash_transferred) {
+                  console.warn("Cash transfer failed");
+                  return false;
+              }
 
               const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens).encodeABI();
               var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'', sellTokens);
