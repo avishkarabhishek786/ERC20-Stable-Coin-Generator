@@ -67,6 +67,7 @@ app.post('/fiat_buy', function(request,response){
     const purchaser_addr = resuestData.purchaser_eth_address;
     let amout_of_tokens = resuestData.purchase_units[0].amount["value"];
     const currency = resuestData.purchase_units[0].amount["currency_code"];
+    const buyer_signature = resuestData.buyer_signature;
 
     if(purchaser_addr == "" || purchaser_addr == null || typeof purchaser_addr == "undefined"){
       response.status(400).json({"res_code":"-7","res_message":"Purchaser address is invalid","data":purchaser_addr});
@@ -76,11 +77,13 @@ app.post('/fiat_buy', function(request,response){
       response.status(400).json({"res_code":"-11","res_message":"USD transferred Is Invalid","data":amout_of_tokens});
     } else if(currency !== "USD") {
         response.status(400).json({"res_code":"-7","res_message":"Currency is not USD","data":currency});
+    } else if(typeof buyer_signature !== "string" || buyer_signature.length<1) {
+        response.status(400).json({"res_code":"-19","res_message":"Invalid buyer signature","data":buyer_signature});
     } else {
       try{    
           web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
             amout_of_tokens = web3.utils.toWei(amout_of_tokens,"ether");
-            var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens).encodeABI();
+            var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens, buyer_signature).encodeABI();
             var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'',buyTokens);
             var tx = new EthereumTx(rawTransaction);
             tx.sign(CASHIER_PRIVATE_KEY);
@@ -115,7 +118,7 @@ app.post('/fiat_buy', function(request,response){
         response.status(400).json({"res_code":"-7","res_message":"Invalid request","data":request.body});
     }
 
-    const {sellingTokenAmount, payPalEmail, redeemerEthAddr} = reqestData;
+    const {sellingTokenAmount, payPalEmail, redeemerEthAddr, sellerSignature} = reqestData;
 
     if(redeemerEthAddr == "" || redeemerEthAddr == null || typeof redeemerEthAddr == "undefined"){
         response.status(400).json({"res_code":"-7","res_message":"Cash redeemer address is invalid","data":redeemerEthAddr});
@@ -123,8 +126,10 @@ app.post('/fiat_buy', function(request,response){
         response.status(400).json({"res_code":"-11","res_message":"Amount of tokens selling must be at least 1.","data":sellingTokenAmount});
       } else if(typeof payPalEmail !== "string" || payPalEmail.length<1) {
           response.status(400).json({"res_code":"-7","res_message":"Invalid email provided.","data":payPalEmail});
-      } else {
-        console.log(sellingTokenAmount, payPalEmail, redeemerEthAddr);
+      } else if(typeof sellerSignature !== "string" || sellerSignature.length<1) {
+        response.status(400).json({"res_code":"-19","res_message":"Invalid seller signature","data":sellerSignature});
+    } else {
+        console.log(sellingTokenAmount, payPalEmail, redeemerEthAddr, sellerSignature);
         try{    
             web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
                 if(err) {
@@ -187,7 +192,7 @@ app.post('/fiat_buy', function(request,response){
                   return false;
               }
 
-              const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens).encodeABI();
+              const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens, sellerSignature).encodeABI();
               var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'', sellTokens);
               var tx = new EthereumTx(rawTransaction);
               tx.sign(CASHIER_PRIVATE_KEY);

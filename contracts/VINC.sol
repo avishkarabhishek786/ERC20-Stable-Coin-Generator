@@ -5,20 +5,32 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
+import './ECDSA.sol';
 
 contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
 
-    address private initiator=0x08a4d0d15e8109Ec487cD3a5735041d8dA911D8B;
-    address private cashier=0x819C5E58e8e2fA2f163398258e967c0e3B63bCE4;
+    using ECDSA for bytes32;
+
+    address private initiator=0xb0b5950EA0570dc9D7E573A70d93a2225eda33cb;
+    address private cashier=0x4E1c35915DA0F90E2c6cA430612C9E1C812A00b7;
 
     modifier onlyInitiator() {
-        require(msg.sender==initiator);
+        require(msg.sender==initiator, "Only admin can call this function.");
         _;
     }
 
     modifier onlyCashier() {
-        require(msg.sender==cashier);
+        require(msg.sender==cashier, "Only cashier can call this function.");
         _;
+    }
+
+    modifier recoverSignerAddress(address loggedInAccount, uint256 numberOfTokens, address tokenAddress, bytes memory signature) {
+         bytes32 hash = keccak256(abi.encodePacked(loggedInAccount, numberOfTokens, tokenAddress));
+         
+         // Verify that the message's signer is the owner of the order
+         address signer = hash.recover(signature);
+         require(signer==loggedInAccount, "Caller is not signer.");
+         _;
     }
     
     mapping (address => mapping (address => uint256)) private _expected_receiving_tokens;
@@ -78,7 +90,12 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
     }
 
     // function to buy for USD
-    function fiat_buy(address recipient, uint256 amount) external onlyCashier returns (bool) {
+    function fiat_buy(address recipient, uint256 amount, bytes memory signature) 
+        external 
+        onlyCashier 
+        recoverSignerAddress(recipient, amount, address(this), signature)
+        returns (bool) 
+    {
         require(amount>0, "Token minted must be greater than 0");
         _mint(recipient, amount);
         emit Token_purchase_through_fiat(recipient, amount);
@@ -86,7 +103,12 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
     }
 
     // function to sell tokens for USD
-    function fiat_redeem(address recipient, uint256 amount) external onlyCashier returns (bool) {
+    function fiat_redeem(address recipient, uint256 amount, bytes memory signature) 
+        external 
+        onlyCashier 
+        recoverSignerAddress(recipient, amount, address(this), signature)
+        returns (bool) 
+    {
         require(amount>0, "Cash amount must be greater than 0");
         _burn(recipient, amount);
         emit Token_sale_through_fiat(recipient, amount);

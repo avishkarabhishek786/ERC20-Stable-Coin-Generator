@@ -6,10 +6,11 @@ import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const abi = require('ethereumjs-abi');
 
 const Paypal = () => {
 
-    const BUYING_TOKEN_ADDRESS = "";
+    const BUYING_TOKEN_ADDRESS = "0x0dea6892e73e38a2854e8aF4983AFdf67615a93d";
 
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
@@ -58,6 +59,7 @@ const Paypal = () => {
         init();
 
         window.ethereum.on('accountsChanged', loginAcc => {
+            console.log(loginAcc);
             setAccounts(loginAcc[0]);
             unsetStates();
         });
@@ -115,9 +117,37 @@ const Paypal = () => {
         setVinc(undefined);
     }
 
+    const signOrder = useCallback((numberOfTokens) => {
+        console.log(isReady());
+        if(!isReady()) return;
+        if(typeof BUYING_TOKEN_ADDRESS !== "string" || BUYING_TOKEN_ADDRESS.length<1) {
+            return console.warn("BUYING_TOKEN_ADDRESS not set");
+        }
+
+        numberOfTokens = parseInt(numberOfTokens).toString();
+
+        // for correct verification in contract convert number of tokens in wei
+        const numberOfTokensInWei = web3.utils.toWei(numberOfTokens,"ether");
+
+          let sha3hash = web3.utils.soliditySha3(
+              {type: 'address', value: loggedInAccount},
+              {type: 'uint256', value: numberOfTokensInWei},
+              {type: 'address', value: BUYING_TOKEN_ADDRESS}
+          );
+          console.log(loggedInAccount);
+          console.log(numberOfTokens);
+          console.log(BUYING_TOKEN_ADDRESS);
+          console.log(sha3hash);
+        
+        const signature = web3.eth.sign(sha3hash, loggedInAccount);
+        console.log(signature);
+        return signature;
+
+    }, [isReady]);
+
     //const [checkout, setCheckout] = useState(false);
 
-    const sendPurchaseDetailToCashier = (puchase_data) => {
+    const sendPurchaseDetailToCashier = async (puchase_data) => {
         // Simple POST request with a JSON body using fetch
         if (!web3.utils.isAddress(loggedInAccount)) {
             setIsError({
@@ -126,7 +156,17 @@ const Paypal = () => {
             });
             return false;
         }
+
+        let amout_of_tokens = puchase_data.purchase_units[0].amount["value"];
+
+        const buyerSignature = await signOrder(amout_of_tokens);
+        console.log(buyerSignature);
+
         puchase_data.purchaser_eth_address = loggedInAccount;
+        puchase_data.buyer_signature = buyerSignature;
+
+        console.log(puchase_data);
+
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -223,6 +263,8 @@ const Paypal = () => {
                     </div>
                 </div>
             </div>
+
+            <input type="button" onClick={()=>signOrder(9)} value="Sign" />
         </>
     )
 

@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const RedeemCash = () => {
 
+    const SELLING_TOKEN_ADDRESS = "0x0dea6892e73e38a2854e8aF4983AFdf67615a93d";
+
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
     const [loggedInAccount, setAccounts] = useState(undefined);
@@ -55,7 +57,35 @@ const RedeemCash = () => {
 
     }
 
-    const sendRedeemCashRequest = (e) => {
+    const signOrder = useCallback((numberOfTokens) => {
+        console.log(isReady());
+        if(!isReady()) return;
+        if(typeof SELLING_TOKEN_ADDRESS !== "string" || SELLING_TOKEN_ADDRESS.length<1) {
+            return console.warn("SELLING_TOKEN_ADDRESS not set");
+        }
+
+        numberOfTokens = parseInt(numberOfTokens).toString();
+
+        // for correct verification in contract convert number of tokens in wei
+        const numberOfTokensInWei = web3.utils.toWei(numberOfTokens,"ether");
+
+          let sha3hash = web3.utils.soliditySha3(
+              {type: 'address', value: loggedInAccount},
+              {type: 'uint256', value: numberOfTokensInWei},
+              {type: 'address', value: SELLING_TOKEN_ADDRESS}
+          );
+          console.log(loggedInAccount);
+          console.log(numberOfTokens);
+          console.log(SELLING_TOKEN_ADDRESS);
+          console.log(sha3hash);
+        
+        const signature = web3.eth.sign(sha3hash, loggedInAccount);
+        console.log(signature);
+        return signature;
+
+    }, [isReady]);
+
+    const sendRedeemCashRequest = async(e) => {
         
         e.preventDefault();
         const sellingTokenAmount = Number(document.getElementById('numberOfTokensIp').value);
@@ -72,7 +102,16 @@ const RedeemCash = () => {
             return;
         } 
 
-        const redeem_data = {sellingTokenAmount, payPalEmail, redeemerEthAddr: loggedInAccount};
+        const sellerSignature = await signOrder(sellingTokenAmount);
+
+        const redeem_data = {
+            sellingTokenAmount, 
+            payPalEmail, 
+            redeemerEthAddr: loggedInAccount,
+            sellerSignature: sellerSignature
+        };
+
+        console.log(redeem_data);
 
         const requestOptions = {
             method: 'POST',
