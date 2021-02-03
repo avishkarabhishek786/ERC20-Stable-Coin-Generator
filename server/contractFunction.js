@@ -68,6 +68,7 @@ app.post('/fiat_buy', function(request,response){
     let amout_of_tokens = resuestData.purchase_units[0].amount["value"];
     const currency = resuestData.purchase_units[0].amount["currency_code"];
     const buyer_signature = resuestData.buyer_signature;
+    const order_nonce = parseInt(resuestData.nonce);
 
     if(purchaser_addr == "" || purchaser_addr == null || typeof purchaser_addr == "undefined"){
       response.status(400).json({"res_code":"-7","res_message":"Purchaser address is invalid","data":purchaser_addr});
@@ -83,7 +84,7 @@ app.post('/fiat_buy', function(request,response){
       try{    
           web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
             amout_of_tokens = web3.utils.toWei(amout_of_tokens,"ether");
-            var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens, buyer_signature).encodeABI();
+            var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens, buyer_signature, order_nonce).encodeABI();
             var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'',buyTokens);
             var tx = new EthereumTx(rawTransaction);
             tx.sign(CASHIER_PRIVATE_KEY);
@@ -192,7 +193,7 @@ app.post('/fiat_buy', function(request,response){
                   return false;
               }
 
-              const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens, sellerSignature).encodeABI();
+              const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens, sellerSignature, reqestData.nonce).encodeABI();
               var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'', sellTokens);
               var tx = new EthereumTx(rawTransaction);
               tx.sign(CASHIER_PRIVATE_KEY);

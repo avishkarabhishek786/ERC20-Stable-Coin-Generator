@@ -11,8 +11,8 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
 
     using ECDSA for bytes32;
 
-    address private initiator=0xb0b5950EA0570dc9D7E573A70d93a2225eda33cb;
-    address private cashier=0x4E1c35915DA0F90E2c6cA430612C9E1C812A00b7;
+    address private initiator=0x934133B7e9cB9b62f60C994fF440DDca5e56e20E;
+    address private cashier=0xA7b466A9D0BFc48853a7513d05Ae36c6DB5D87d0;
 
     modifier onlyInitiator() {
         require(msg.sender==initiator, "Only admin can call this function.");
@@ -24,8 +24,9 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
         _;
     }
 
-    modifier recoverSignerAddress(address loggedInAccount, uint256 numberOfTokens, address tokenAddress, bytes memory signature) {
-         bytes32 hash = keccak256(abi.encodePacked(loggedInAccount, numberOfTokens, tokenAddress));
+    modifier recoverSignerAddress(address loggedInAccount, uint256 numberOfTokens, 
+    address tokenAddress, bytes memory signature, uint64 nonce) {
+         bytes32 hash = keccak256(abi.encodePacked(loggedInAccount, numberOfTokens, tokenAddress, nonce));
          
          // Verify that the message's signer is the owner of the order
          address signer = hash.recover(signature);
@@ -38,6 +39,14 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
     event Set_receiving_tokens(address indexed owner, address indexed buyer, uint256 value);
     event Token_purchase_through_fiat(address indexed recipient, uint256 amount);
     event Token_sale_through_fiat(address indexed recipient, uint256 amount);
+
+    mapping(address => uint64) buyNonces;
+    mapping(address => uint64) sellNonces;
+
+    enum userActivity {
+        BUY,
+        SELL
+    }
 
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public payable ERC20(_name, _symbol) {
         require(tx.origin != address(0), "Token creator is not a valid address.");
@@ -89,27 +98,40 @@ contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
         cashier = _cashier;
     }
 
+    function getNonce(userActivity _type, address _addr) public view returns (uint64 nonce) {
+        if(_type==userActivity.BUY) {
+            nonce = buyNonces[_addr];
+        } else if(_type==userActivity.SELL) {
+            nonce = sellNonces[_addr];
+        }
+        return nonce;
+    }
+
     // function to buy for USD
-    function fiat_buy(address recipient, uint256 amount, bytes memory signature) 
+    function fiat_buy(address recipient, uint256 amount, bytes memory signature, uint64 nonce) 
         external 
         onlyCashier 
-        recoverSignerAddress(recipient, amount, address(this), signature)
+        recoverSignerAddress(recipient, amount, address(this), signature, nonce)
         returns (bool) 
     {
         require(amount>0, "Token minted must be greater than 0");
+        require(buyNonces[recipient]==nonce, "Invalid buy nonce");
+        buyNonces[recipient]++;
         _mint(recipient, amount);
         emit Token_purchase_through_fiat(recipient, amount);
         return true;
     }
 
     // function to sell tokens for USD
-    function fiat_redeem(address recipient, uint256 amount, bytes memory signature) 
+    function fiat_redeem(address recipient, uint256 amount, bytes memory signature, uint64 nonce) 
         external 
         onlyCashier 
-        recoverSignerAddress(recipient, amount, address(this), signature)
+        recoverSignerAddress(recipient, amount, address(this), signature, nonce)
         returns (bool) 
     {
         require(amount>0, "Cash amount must be greater than 0");
+        require(sellNonces[recipient]==nonce, "Invalid sell nonce");
+        sellNonces[recipient]++;
         _burn(recipient, amount);
         emit Token_sale_through_fiat(recipient, amount);
         return true;

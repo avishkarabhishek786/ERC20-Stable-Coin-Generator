@@ -10,7 +10,7 @@ const abi = require('ethereumjs-abi');
 
 const Paypal = () => {
 
-    const BUYING_TOKEN_ADDRESS = "0x0dea6892e73e38a2854e8aF4983AFdf67615a93d";
+    const BUYING_TOKEN_ADDRESS = "0xa20799F4F3C425ca3F5984CEA2a081FeaE32bc31";
 
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
@@ -51,8 +51,8 @@ const Paypal = () => {
         const tokenFactory = new web3.eth.Contract(TokenFactory.abi, tokenFactoryData.address);
         setTokenFactory(tokenFactory);
 
-        const buyingToken = new web3.eth.Contract(VINC.abi, BUYING_TOKEN_ADDRESS);
-        setVinc(buyingToken);
+        const vinc = new web3.eth.Contract(VINC.abi, BUYING_TOKEN_ADDRESS);
+        setVinc(vinc);
     }
 
     useEffect(() => {
@@ -71,9 +71,10 @@ const Paypal = () => {
             typeof web3 !== 'undefined'
             && typeof loggedInAccount !== 'undefined'
             && typeof tokenFactory !== 'undefined'
+            && typeof vinc !== 'undefined'
             && isError.state !== true
         )
-    }, [web3, loggedInAccount, tokenFactory]);
+    }, [web3, loggedInAccount, tokenFactory, vinc]);
 
     useEffect(() => {
         console.log(isReady());
@@ -117,9 +118,9 @@ const Paypal = () => {
         setVinc(undefined);
     }
 
-    const signOrder = useCallback((numberOfTokens) => {
-        console.log(isReady());
-        if(!isReady()) return;
+    const signOrder = async (numberOfTokens, nonce) => {
+        
+        if(!isReady()) return null;
         if(typeof BUYING_TOKEN_ADDRESS !== "string" || BUYING_TOKEN_ADDRESS.length<1) {
             return console.warn("BUYING_TOKEN_ADDRESS not set");
         }
@@ -132,18 +133,20 @@ const Paypal = () => {
           let sha3hash = web3.utils.soliditySha3(
               {type: 'address', value: loggedInAccount},
               {type: 'uint256', value: numberOfTokensInWei},
-              {type: 'address', value: BUYING_TOKEN_ADDRESS}
+              {type: 'address', value: BUYING_TOKEN_ADDRESS},
+              {type: 'uint64', value: nonce}
           );
           console.log(loggedInAccount);
-          console.log(numberOfTokens);
+          console.log(numberOfTokensInWei);
           console.log(BUYING_TOKEN_ADDRESS);
           console.log(sha3hash);
+          console.log(nonce);
         
         const signature = web3.eth.sign(sha3hash, loggedInAccount);
         console.log(signature);
         return signature;
 
-    }, [isReady]);
+    }
 
     //const [checkout, setCheckout] = useState(false);
 
@@ -159,11 +162,22 @@ const Paypal = () => {
 
         let amout_of_tokens = puchase_data.purchase_units[0].amount["value"];
 
-        const buyerSignature = await signOrder(amout_of_tokens);
+        // Get nonce
+        const nonce = await vinc.methods.getNonce(0, loggedInAccount).call();
+
+        const buyerSignature = await signOrder(amout_of_tokens, nonce);
         console.log(buyerSignature);
+        if(typeof buyerSignature !== "string" || buyerSignature.length<1) {
+            setIsError({
+                state: true,
+                msg: "Invalid signature: " + buyerSignature
+            });
+            return false;
+        }
 
         puchase_data.purchaser_eth_address = loggedInAccount;
         puchase_data.buyer_signature = buyerSignature;
+        puchase_data.nonce = nonce;
 
         console.log(puchase_data);
 
@@ -263,8 +277,6 @@ const Paypal = () => {
                     </div>
                 </div>
             </div>
-
-            <input type="button" onClick={()=>signOrder(9)} value="Sign" />
         </>
     )
 

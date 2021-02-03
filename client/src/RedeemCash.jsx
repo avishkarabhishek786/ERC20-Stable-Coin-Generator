@@ -2,16 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './Elems';
 import "./index.css";
 import { getWeb3 } from "./utils";
+import VINC from "./abis/VINC.json";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const RedeemCash = () => {
 
-    const SELLING_TOKEN_ADDRESS = "0x0dea6892e73e38a2854e8aF4983AFdf67615a93d";
+    const SELLING_TOKEN_ADDRESS = "0xa20799F4F3C425ca3F5984CEA2a081FeaE32bc31";
 
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
     const [loggedInAccount, setAccounts] = useState(undefined);
+    const [vinc, setVinc] = useState(undefined);
     const [isError, setIsError] = useState({
         state: false,
         msg: ""
@@ -26,6 +28,9 @@ const RedeemCash = () => {
         web3.eth.defaultAccount = loggedInAccount[0];
         setWeb3(web3);
         setAccounts(loggedInAccount[0]);
+
+        const vinc = new web3.eth.Contract(VINC.abi, SELLING_TOKEN_ADDRESS);
+        setVinc(vinc);
     }
 
     useEffect(() => {
@@ -33,7 +38,6 @@ const RedeemCash = () => {
 
         window.ethereum.on('accountsChanged', loginAcc => {
             setAccounts(loginAcc[0]);
-            unsetStates();
         });
 
     }, []);
@@ -42,24 +46,14 @@ const RedeemCash = () => {
         return (
             typeof web3 !== 'undefined'
             && typeof loggedInAccount !== 'undefined'
+            && typeof vinc === "object"
             && isError.state !== true
         )
-    }, [web3, loggedInAccount]);
+    }, [web3, loggedInAccount, vinc, isError]);
 
-    useEffect(() => {
+    const signOrder = async (numberOfTokens, nonce) => {
         console.log(isReady());
-        console.log(loggedInAccount);
-        if (!isReady()) return;
-        
-    }, [isReady])
-
-    const unsetStates = () => {
-
-    }
-
-    const signOrder = useCallback((numberOfTokens) => {
-        console.log(isReady());
-        if(!isReady()) return;
+        if(!isReady()) return null;
         if(typeof SELLING_TOKEN_ADDRESS !== "string" || SELLING_TOKEN_ADDRESS.length<1) {
             return console.warn("SELLING_TOKEN_ADDRESS not set");
         }
@@ -72,7 +66,8 @@ const RedeemCash = () => {
           let sha3hash = web3.utils.soliditySha3(
               {type: 'address', value: loggedInAccount},
               {type: 'uint256', value: numberOfTokensInWei},
-              {type: 'address', value: SELLING_TOKEN_ADDRESS}
+              {type: 'address', value: SELLING_TOKEN_ADDRESS},
+              {type: 'uint64', value: nonce}
           );
           console.log(loggedInAccount);
           console.log(numberOfTokens);
@@ -83,7 +78,7 @@ const RedeemCash = () => {
         console.log(signature);
         return signature;
 
-    }, [isReady]);
+    }
 
     const sendRedeemCashRequest = async(e) => {
         
@@ -102,13 +97,22 @@ const RedeemCash = () => {
             return;
         } 
 
-        const sellerSignature = await signOrder(sellingTokenAmount);
+        // Get nonce
+        const nonce = await vinc.methods.getNonce(1, loggedInAccount).call();
+
+        const sellerSignature = await signOrder(sellingTokenAmount, nonce);
+
+        if(typeof sellerSignature !== "string" || sellerSignature.length<1) {
+            showMessage("Empty signature", false);
+            return;
+        }   
 
         const redeem_data = {
             sellingTokenAmount, 
             payPalEmail, 
             redeemerEthAddr: loggedInAccount,
-            sellerSignature: sellerSignature
+            sellerSignature: sellerSignature,
+            nonce: nonce
         };
 
         console.log(redeem_data);
