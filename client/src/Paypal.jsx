@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Navbar } from './Elems';
 import "./index.css";
-import VINC from "./abis/VINC.json";
+import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
 import { ToastContainer, toast } from 'react-toastify';
@@ -10,13 +10,13 @@ const abi = require('ethereumjs-abi');
 
 const Paypal = () => {
 
-    const BUYING_TOKEN_ADDRESS = "0xa20799F4F3C425ca3F5984CEA2a081FeaE32bc31";
+    const BUYING_TOKEN_ADDRESS = "0xed9213701834d12516d49d2df88f1da32b6c1723";
 
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
     const [loggedInAccount, setAccounts] = useState(undefined);
     const [tokenFactory, setTokenFactory] = useState(undefined);
-    const [vinc, setVinc] = useState(undefined);
+    const [edgeCoin, setEDGECOIN] = useState(undefined);
     const [isError, setIsError] = useState({
         state: false,
         msg: ""
@@ -51,8 +51,8 @@ const Paypal = () => {
         const tokenFactory = new web3.eth.Contract(TokenFactory.abi, tokenFactoryData.address);
         setTokenFactory(tokenFactory);
 
-        const vinc = new web3.eth.Contract(VINC.abi, BUYING_TOKEN_ADDRESS);
-        setVinc(vinc);
+        const edgeCoin = new web3.eth.Contract(EDGECOIN.abi, BUYING_TOKEN_ADDRESS);
+        setEDGECOIN(edgeCoin);
     }
 
     useEffect(() => {
@@ -71,10 +71,10 @@ const Paypal = () => {
             typeof web3 !== 'undefined'
             && typeof loggedInAccount !== 'undefined'
             && typeof tokenFactory !== 'undefined'
-            && typeof vinc !== 'undefined'
+            && typeof edgeCoin !== 'undefined'
             && isError.state !== true
         )
-    }, [web3, loggedInAccount, tokenFactory, vinc]);
+    }, [web3, loggedInAccount, tokenFactory, edgeCoin]);
 
     useEffect(() => {
         console.log(isReady());
@@ -115,7 +115,7 @@ const Paypal = () => {
     }, [isReady])
 
     const unsetStates = () => {
-        setVinc(undefined);
+        setEDGECOIN(undefined);
     }
 
     const signOrder = async (numberOfTokens, nonce) => {
@@ -163,7 +163,7 @@ const Paypal = () => {
         let amout_of_tokens = puchase_data.purchase_units[0].amount["value"];
 
         // Get nonce
-        const nonce = await vinc.methods.getNonce(0, loggedInAccount).call();
+        const nonce = await edgeCoin.methods.getNonce(0, loggedInAccount).call();
 
         const buyerSignature = await signOrder(amout_of_tokens, nonce);
         console.log(buyerSignature);

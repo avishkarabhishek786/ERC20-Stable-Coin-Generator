@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useReducer, useCallback} from 'react';
 import  {Navbar, WalletUI}  from './Elems';
-import VINC from "./abis/VINC.json";
+import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
 
@@ -12,7 +12,7 @@ const Wallet = () => {
     const [tokenFactory, setTokenFactory] = useState(undefined);
     const [tokenOwnersList, setTokenOwnersList] = useState([]);
     const [tokenList, setTokenList] = useState([]);
-    const [vinc, setVinc] = useState(undefined);
+    const [EDGECOIN, setEDGECOIN] = useState(undefined);
     const [isError, setIsError] = useState({
         state: false,
         msg: ""

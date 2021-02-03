@@ -2,18 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './Elems';
 import "./index.css";
 import { getWeb3 } from "./utils";
-import VINC from "./abis/VINC.json";
+import EDGECOIN from "./abis/EDGECOIN.json";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const RedeemCash = () => {
 
-    const SELLING_TOKEN_ADDRESS = "0xa20799F4F3C425ca3F5984CEA2a081FeaE32bc31";
+    const SELLING_TOKEN_ADDRESS = "0xed9213701834d12516d49d2df88f1da32b6c1723";
 
     const [web3, setWeb3] = useState(undefined);
     const [networkId, setNetworkId] = useState(undefined);
     const [loggedInAccount, setAccounts] = useState(undefined);
-    const [vinc, setVinc] = useState(undefined);
+    const [edgeCoin, setEDGECOIN] = useState(undefined);
     const [isError, setIsError] = useState({
         state: false,
         msg: ""
@@ -29,8 +29,8 @@ const RedeemCash = () => {
         setWeb3(web3);
         setAccounts(loggedInAccount[0]);
 
-        const vinc = new web3.eth.Contract(VINC.abi, SELLING_TOKEN_ADDRESS);
-        setVinc(vinc);
+        const edgeCoin = new web3.eth.Contract(EDGECOIN.abi, SELLING_TOKEN_ADDRESS);
+        setEDGECOIN(edgeCoin);
     }
 
     useEffect(() => {
@@ -46,10 +46,10 @@ const RedeemCash = () => {
         return (
             typeof web3 !== 'undefined'
             && typeof loggedInAccount !== 'undefined'
-            && typeof vinc === "object"
+            && typeof edgeCoin === "object"
             && isError.state !== true
         )
-    }, [web3, loggedInAccount, vinc, isError]);
+    }, [web3, loggedInAccount, edgeCoin, isError]);
 
     const signOrder = async (numberOfTokens, nonce) => {
         console.log(isReady());
@@ -98,7 +98,7 @@ const RedeemCash = () => {
         } 
 
         // Get nonce
-        const nonce = await vinc.methods.getNonce(1, loggedInAccount).call();
+        const nonce = await edgeCoin.methods.getNonce(1, loggedInAccount).call();
 
         const sellerSignature = await signOrder(sellingTokenAmount, nonce);
 

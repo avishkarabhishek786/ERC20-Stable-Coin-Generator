@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar, InfoData, ChangeSecondTraderAddress, SetTokensToSwap } from './Elems';
-import VINC from "./abis/VINC.json";
+import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import TokenExchange from "./abis/TokenExchange.json";
 import { getWeb3 } from "./utils";
@@ -252,15 +252,15 @@ const Swap = () => {
 
         const updateTokenAddrs = async () => {
             console.log(token_addr1, token_addr2);
-            const token1 = new web3.eth.Contract(VINC.abi, token_addr1);
-            const token2 = new web3.eth.Contract(VINC.abi, token_addr2);
+            const token1 = new web3.eth.Contract(EDGECOIN.abi, token_addr1);
+            const token2 = new web3.eth.Contract(EDGECOIN.abi, token_addr2);
             setToken1(token1);
             setToken2(token2);
             localStorage.setItem("token_addr1", token_addr1);
             localStorage.setItem("token_addr2", token_addr2);
 
-            const token_1 = new web3.eth.Contract(VINC.abi, token_addr1);
-            const token_2 = new web3.eth.Contract(VINC.abi, token_addr2);
+            const token_1 = new web3.eth.Contract(EDGECOIN.abi, token_addr1);
+            const token_2 = new web3.eth.Contract(EDGECOIN.abi, token_addr2);
             setToken1(token_1);
             setToken2(token_2);
             const token1_name = await token1.methods.name().call();

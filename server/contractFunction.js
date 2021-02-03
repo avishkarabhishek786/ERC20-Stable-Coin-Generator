@@ -7,7 +7,7 @@ const paypalPayoutFuncs = require('./paypalPayoutFuncs');
 var app = express.Router();
 var Web3 = require('web3');
 var EthereumTx = require('ethereumjs-tx').Transaction;
-const TOKEN_JSON = require("../client/src/abis/VINC.json");
+const TOKEN_JSON = require("../client/src/abis/EDGECOIN.json");
 
 require('dotenv').config();
 
@@ -18,14 +18,13 @@ if(typeof process.env.CASHIER_PRIVATE_KEY !=="string") {
 const CASHIER_PRIVATE_KEY = Buffer.from(process.env.CASHIER_PRIVATE_KEY, 'hex');
 const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS;
 const CASHIER_ADDRESS = process.env.CASHIER_ADDRESS;
+const NETWORK_NAME = process.env.NETWORK_NAME;
 
 let web3;
-if (typeof web3 !== 'undefined') {
-    web3 = new Web3(web3.currentProvider);
-} else {
-    // set the provider you want from Web3.providers
-    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
-}
+const provider = new Web3.providers.HttpProvider(
+    "https://ropsten.infura.io/v3/eaf58e744a7b4555a054e920e76fad12"
+  );
+web3 = new Web3(provider);
 
 var BN = web3.utils.BN;
 app.use(cors());
@@ -84,14 +83,17 @@ app.post('/fiat_buy', function(request,response){
       try{    
           web3.eth.getTransactionCount(CASHIER_ADDRESS, async function(err,nonce) {
             amout_of_tokens = web3.utils.toWei(amout_of_tokens,"ether");
+            console.log(purchaser_addr, amout_of_tokens, buyer_signature, order_nonce);
             var buyTokens = TokenInstance.methods.fiat_buy(purchaser_addr, amout_of_tokens, buyer_signature, order_nonce).encodeABI();
             var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'',buyTokens);
-            var tx = new EthereumTx(rawTransaction);
+            var tx = new EthereumTx(rawTransaction, { chain: NETWORK_NAME, hardfork: 'petersburg' });
             tx.sign(CASHIER_PRIVATE_KEY);
             var serializedTx = tx.serialize();
             const rawTx = '0x' + serializedTx.toString('hex');
 
             console.log(rawTx);
+            console.log(CASHIER_PRIVATE_KEY);
+            console.log(CASHIER_ADDRESS);
 
             web3.eth.sendSignedTransaction(rawTx, function(error,hash) {
               if (!error){
@@ -195,7 +197,7 @@ app.post('/fiat_buy', function(request,response){
 
               const sellTokens = TokenInstance.methods.fiat_redeem(redeemerEthAddr, amout_of_tokens, sellerSignature, reqestData.nonce).encodeABI();
               var rawTransaction = await getRawTransaction(nonce,'','', TOKEN_ADDRESS,'', sellTokens);
-              var tx = new EthereumTx(rawTransaction);
+              var tx = new EthereumTx(rawTransaction, { chain: NETWORK_NAME, hardfork: 'petersburg' });
               tx.sign(CASHIER_PRIVATE_KEY);
               var serializedTx = tx.serialize();
               const rawTx = '0x' + serializedTx.toString('hex');

@@ -7,12 +7,12 @@ import '@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
 import './ECDSA.sol';
 
-contract VINC is Ownable, ERC20Burnable, ERC20Pausable {
+contract EDGECOIN is Ownable, ERC20Burnable, ERC20Pausable {
 
     using ECDSA for bytes32;
 
-    address private initiator=0x934133B7e9cB9b62f60C994fF440DDca5e56e20E;
-    address private cashier=0xA7b466A9D0BFc48853a7513d05Ae36c6DB5D87d0;
+    address private initiator=0xeF40621A6fF2046a9c66E20FCC1E12A48Eb56a2e;
+    address private cashier=0x00Dd4cE8a3Ba697a17c079589004446d267435df;
 
     modifier onlyInitiator() {
         require(msg.sender==initiator, "Only admin can call this function.");

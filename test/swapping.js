@@ -1,5 +1,5 @@
 /*
-const VINC = artifacts.require('VINC');
+const EDGECOIN = artifacts.require('EDGECOIN');
 const TokenExchange = artifacts.require("TokenExchange");
 
 contract('SwapTest', ([account1, account2, account3])=> {
@@ -10,8 +10,8 @@ contract('SwapTest', ([account1, account2, account3])=> {
     let tokenExchangeAddr = null; //
     
     before(async () =>{
-        token1 = await VINC.new("Token 1", "TKN1", 1000, {from: account1});
-        token2 = await VINC.new("Token 2", "TKN2", 1000, {from: account2});
+        token1 = await EDGECOIN.new("Token 1", "TKN1", 1000, {from: account1});
+        token2 = await EDGECOIN.new("Token 2", "TKN2", 1000, {from: account2});
         tokenExchange = await TokenExchange.new(token1.address, token2.address, {from: account3});
 
         tokenExchangeAddr = tokenExchange.address;

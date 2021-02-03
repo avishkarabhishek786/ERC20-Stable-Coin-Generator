@@ -1,4 +1,4 @@
-const VINC = artifacts.require('VINC');
+const EDGECOIN = artifacts.require('EDGECOIN');
 const TokenFactory = artifacts.require("TokenFactory");
 const TokenExchange = artifacts.require("TokenExchange");
 
@@ -41,8 +41,8 @@ contract('TokenFactoryTest', ([account1, account2, account3])=> {
         token2Addr = await tokenFactory.tokensList(account3);
 
         // 2.3 Create instances of both tokens
-        token1 = await VINC.at(token1Addr);
-        token2 = await VINC.at(token2Addr);
+        token1 = await EDGECOIN.at(token1Addr);
+        token2 = await EDGECOIN.at(token2Addr);
 
         // 3. Deploy Swap TokenExchange
         tokenExchange = await TokenExchange.new(token1Addr, token2Addr, {from: account1});

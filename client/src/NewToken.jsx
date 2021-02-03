@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import  {Navbar, NewTokenUI}  from './Elems';
-import VINC from "./abis/VINC.json";
+import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
 
@@ -10,7 +10,7 @@ const NewToken = () => {
     const [networkId, setNetworkId] = useState(undefined);
     const [loggedInAccount, setAccounts] = useState(undefined);
     const [tokenFactory, setTokenFactory] = useState(undefined);
-    const [vinc, setVinc] = useState(undefined);
+    const [EDGECOIN, setEDGECOIN] = useState(undefined);
     const [isError, setIsError] = useState({
         state: false,
         msg: ""
