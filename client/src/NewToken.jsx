@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import  {Navbar, NewTokenUI}  from './Elems';
+import  {Navbar, NewTokenUI, showMessage}  from './Elems';
 import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
@@ -108,6 +108,7 @@ const NewToken = () => {
                 console.log(receipt);
                 const newTokenAddress = await tokenFactory.methods.tokensList(loggedInAccount).call();
                 console.log(newTokenAddress);
+                showMessage(`Token created at address: ${newTokenAddress}`, true);
             })
             .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
                 console.error(error);

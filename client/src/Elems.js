@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Link } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const Navbar = () => {
     return (
@@ -21,9 +22,6 @@ export const Navbar = () => {
                 </li>
                 <li className="nav-item">
                     <Link className="nav-link" to="/swap">Swap Tokens</Link>
-                </li>
-                <li className="nav-item">
-                    <Link className="nav-link" to="/wallet">Wallet</Link>
                 </li>
                 <li className="nav-item">
                     <Link className="nav-link" to="/buy">Buy Tokens</Link>
@@ -49,6 +47,23 @@ export const Navbar = () => {
         </>
     )
 }
+
+export const showMessage = (msg = '', success = true) => {
+    const options = {
+        position: "top-right",
+        autoClose: 15000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+    }
+        if (success === true) {
+            toast.success(msg, options)
+        } else {
+            toast.error(msg, options)
+        }
+};
 
 export const InfoData = (props) => {
     return (

@@ -5,7 +5,7 @@ import './EDGECOIN.sol';
 
 contract TokenExchange {
     
-    string public name = 'ERC20 Tokens Instant Exchange';
+    string public name = 'ERC20 SAFE SWAP EXCHANGE';
  
     event TokensPurchased(
         EDGECOIN coin,

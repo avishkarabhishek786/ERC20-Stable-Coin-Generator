@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Navbar } from './Elems';
+import { Navbar, showMessage } from './Elems';
 import "./index.css";
 import EDGECOIN from "./abis/EDGECOIN.json";
 import TokenFactory from "./abis/TokenFactory.json";
 import { getWeb3 } from "./utils";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer, toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 const abi = require('ethereumjs-abi');
 
 const Paypal = () => {
@@ -209,23 +209,6 @@ const Paypal = () => {
                 }
             });
     }
-
-    const showMessage = (msg = '', success = true) => {
-        const options = {
-            position: "top-right",
-            autoClose: 15000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        }
-            if (success === true) {
-                toast.success(msg, options)
-            } else {
-                toast.error(msg, options)
-            }
-    };
 
     // If the payment has been made
     if (paid) {

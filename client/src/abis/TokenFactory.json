@@ -18,8 +18,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -38,8 +37,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -62,8 +60,7 @@
       "name": "createToken",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function",
-      "payable": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -76,8 +73,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_symbol\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_initialSupply\",\"type\":\"uint256\"}],\"name\":\"createToken\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTokensOwnersList\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"tokenOwners\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"tokensList\",\"outputs\":[{\"internalType\":\"contract EDGECOIN\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/aks/Documents/Ethereum/projects/ERC20-Stable-Coin-Generator/contracts/TokenFactory.sol\":\"TokenFactory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/aks/Documents/Ethereum/projects/ERC20-Stable-Coin-Generator/contracts/ECDSA.sol\":{\"keccak256\":\"0x67f1b4b07baf9af8d95f456b06f5f408746ff76003f95f0be7b2e406fb16bf48\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://59520a3d669b1789d68a4daf73cb6a6adef061e8a49af233099a2d663c0db30c\",\"dweb:/ipfs/QmYwytUAa3JFe84uxRaSHN21ii8rvj5fn8ABuQrKDWV16z\"]},\"/home/aks/Documents/Ethereum/projects/ERC20-Stable-Coin-Generator/contracts/EDGECOIN.sol\":{\"keccak256\":\"0xa8bb7cd469c0cd2eb9cc300eda56909db783ba3a68f0f49834860014389ec40e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2ab55722eb76caf59c8fb0eb49f9f16127fa8b7699011aa3e3a17c6fa2cab5b6\",\"dweb:/ipfs/QmRg7uuL7PhVBs2zDPB48ZdSvnVNZ9vquAYJXHsKmBouUG\"]},\"/home/aks/Documents/Ethereum/projects/ERC20-Stable-Coin-Generator/contracts/TokenFactory.sol\":{\"keccak256\":\"0x53c90e9a62e16e337cbf81e15a10174fd9d03ae3f6882c8138ba9fb564c83400\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f26410bff386e324001d3e8b07e29dd151da6e3161588d6a979cb71ffbdeff5e\",\"dweb:/ipfs/QmSHpbpWtAauo7qLMFBDxpsaaMncPnT8HMjP8iF7kqstgc\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ded47ec7c96750f9bd04bbbc84f659992d4ba901cb7b532a52cd468272cf378f\",\"dweb:/ipfs/QmfBrGtQP7rZEqEg6Wz6jh2N2Kukpj1z5v3CGWmAqrzm96\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0xf7c39c7e6d06ed3bda90cfefbcbf2ddc32c599c3d6721746546ad64946efccaa\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://cb57a28e189cd8b05748db44bdd51d608e6f1364dd1b35ad921e1bc82c10631e\",\"dweb:/ipfs/QmaWWTBbVu2pRR9XUbE4iC159NoP59cRF9ZJwhf4ghFN9i\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x3b21f2c8d626de3b9925ae33e972d8bf5c8b1bffb3f4ee94daeed7d0679036e6\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7f8d45329fecbf0836ad7543330c3ecd0f8d0ffa42d4016278c3eb2215fdcdfe\",\"dweb:/ipfs/QmXWLT7GcnHtA5NiD6MFi2CV3EWJY4wv5mLNnypqYDrxL3\"]},\"@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0xcbd85c86627a47fd939f1f4ee3ba626575ff2a182e1804b29f5136394449b538\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://53c6a80c519bb9356aad28efa9a1ec31603860eb759d2dc57f545fcae1dd1aca\",\"dweb:/ipfs/QmfRS6TtMNUHhvgLHXK21qKNnpn2S7g2Yd1fKaHKyFiJsR\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol\":{\"keccak256\":\"0x20569e5d91a1f7478f4579962d35b35e5c68e10c5718696e3863c1a588da87c4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5ace7d16e99eb77a33c3680964706a39ca6c91aebd4f911f4b70430881cc85b8\",\"dweb:/ipfs/Qmb7g4vz3x238NMF9US6q8xUUamDy9upxZnms6ZaKkN37U\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol\":{\"keccak256\":\"0xa22af140ae7ec1f8f2f3bed5869cd0d548dfaac66343f0efc7324ff34aaf1254\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fed479feda7354e89c095fde0927dcb581f460257bf93b7db54b2b902b4bbd48\",\"dweb:/ipfs/QmSDUhS2AQvTGXHwaxDgAXtwXKCgQh2kp1nwhwUgr2hQZK\"]},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x5f02220344881ce43204ae4a6281145a67bc52c2bb1290a791857df3d19d78f5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://24427744bd3e6cb73c17010119af12a318289c0253a4d9acb8576c9fb3797b08\",\"dweb:/ipfs/QmTLDqpKRBuxGxRAmjgXt9AkXyACW3MtKzi7PYjm5iMfGC\"]},\"@openzeppelin/contracts/utils/Pausable.sol\":{\"keccak256\":\"0x065360ef3924db6b63c2160886b5de737497dd64a917e362dd8d857cda1f5ae2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://946fe57f3b935f0f4a41345b3eedb617c30912ba5e802bd6b430b394114048ab\",\"dweb:/ipfs/QmRVgUK6yHgqiVWoFn51aUGYejR8romW2ZqwVvSFMnhnJW\"]}},\"version\":1}",
@@ -2919,7 +2915,7 @@
     }
   },
   "schemaVersion": "3.3.2",
-  "updatedAt": "2021-02-03T12:04:25.053Z",
+  "updatedAt": "2021-02-08T08:42:45.144Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
